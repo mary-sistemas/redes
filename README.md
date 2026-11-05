@@ -2,7 +2,7 @@
 
 Web interactiva para repasar el módulo de **Planificación y Administración de Redes** de ASIR (unidades 1 a 3). Cada tema explica el porqué con analogías, incluye simuladores paso a paso y termina con preguntas tipo examen para autoevaluarse.
 
-**Ver la web:** `[https://unknown-user755.github.io/repaso-redes/`](https://unknown-user755.github.io/redes/redes1_2_3/)
+**Ver la web:** (https://unknown-user755.github.io/redes/redes1_2_3/)
 
 ## Temas
 
