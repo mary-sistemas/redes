@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Repaso de Redes UT1–UT3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Repaso interactivo de Redes (ASIR): numeración, capas y protocolos, cableado, comprobador de cables y Wi-Fi.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+
+  <header class="hero">
+    <span class="eyebrow">ASIR · Planificación y Administración de Redes · UT1–UT3</span>
+    <h1>Entender las redes, capa a capa</h1>
+    <p>Un repaso interactivo de las tres primeras unidades: sistemas de numeración, modelos de capas y protocolos, y la capa física con cableado y Wi-Fi. Cada tema explica el porqué, trae simuladores para tocar y termina con preguntas tipo examen.</p>
+    <div class="como">
+      <div><strong>1. Lee la idea</strong>Cada tema empieza con una analogía de la vida real.</div>
+      <div><strong>2. Toca los simuladores</strong>Avanza paso a paso y mira qué cambia.</div>
+      <div><strong>3. Compruébate</strong>Responde con tus palabras, mira la solución y márcate.</div>
+    </div>
+  </header>
+
+  <section class="ut-bloque" aria-labelledby="ut1">
+    <div class="ut-cab"><span class="num">UT1</span><h2 id="ut1">Fundamentos y redes locales</h2></div>
+    <div class="temas-grid">
+      <div class="tarjeta pronto"><div class="badges"><span class="badge">Próximamente</span></div><h3>Sistemas de numeración</h3><p>Binario, octal y hexadecimal. Conversiones en las dos direcciones y por qué los ordenadores cuentan en base 2.</p></div>
+      <div class="tarjeta pronto"><div class="badges"><span class="badge">Próximamente</span></div><h3>Puertas lógicas</h3><p>AND, OR, NOT, NAND, NOR y XOR con sus tablas de verdad.</p></div>
+      <div class="tarjeta pronto"><div class="badges"><span class="badge">Próximamente</span></div><h3>Redes locales y medios</h3><p>Tipos de redes, topologías, medios guiados e inalámbricos y tipos de par trenzado (UTP, FTP, STP).</p></div>
+    </div>
+  </section>
+
+  <section class="ut-bloque" aria-labelledby="ut2">
+    <div class="ut-cab"><span class="num">UT2</span><h2 id="ut2">Arquitecturas y protocolos</h2></div>
+    <div class="temas-grid">
+      <a class="tarjeta" href="temas/capas.html" data-tema="capas" data-total="10">
+        <div class="badges"><span class="badge listo">Disponible</span></div>
+        <h3>Capas y protocolos</h3>
+        <p>OSI y TCP/IP, encapsulamiento, qué cambia al pasar por un switch o un router, TCP frente a UDP, puertos y EtherType.</p>
+        <span class="progreso"></span>
+      </a>
+      <div class="tarjeta pronto"><div class="badges"><span class="badge">Próximamente</span></div><h3>Wireshark y tramas</h3><p>Leer una captura: campos de Ethernet, IP, ARP e ICMP. Ethernet II frente a 802.3.</p></div>
+      <div class="tarjeta pronto"><div class="badges"><span class="badge">Próximamente</span></div><h3>Normalización e IEEE 802</h3><p>Organismos de estándares y qué regula cada norma 802: LLC, MAC, 802.3, 802.11, 802.1Q.</p></div>
+    </div>
+  </section>
+
+  <section class="ut-bloque" aria-labelledby="ut3">
+    <div class="ut-cab"><span class="num">UT3</span><h2 id="ut3">La capa física</h2></div>
+    <div class="temas-grid">
+      <div class="tarjeta pronto"><div class="badges"><span class="badge">Próximamente</span></div><h3>Señal y modulación</h3><p>Analógica y digital, ancho de banda, codificación y modulaciones como QAM.</p></div>
+      <div class="tarjeta pronto"><div class="badges"><span class="badge">Próximamente</span></div><h3>Cables y categorías</h3><p>Nomenclatura 100BASE-TX, categorías 5e a 8, distancias y velocidades.</p></div>
+      <div class="tarjeta pronto"><div class="badges"><span class="badge seguro">Clave</span><span class="badge">Próximamente</span></div><h3>Crimpado y comprobador</h3><p>T568A y T568B, cable directo y cruzado, y cómo diagnosticar errores con los LED del comprobador.</p></div>
+      <div class="tarjeta pronto"><div class="badges"><span class="badge">Próximamente</span></div><h3>Wi-Fi</h3><p>Bandas y canales, normas 802.11, SSID y roaming, seguridad WEP, WPA2 y WPA3.</p></div>
+      <div class="tarjeta pronto"><div class="badges"><span class="badge">Próximamente</span></div><h3>Cableado estructurado</h3><p>Subsistemas, armario, latiguillos, rosetas y la regla de 90 + 10 metros.</p></div>
+    </div>
+  </section>
+
+  <footer class="pie">
+    <span>Material de repaso hecho por una estudiante de ASIR. Si ves un error, abre un issue en GitHub.</span>
+    <span>Tu progreso se guarda solo en este navegador.</span>
+  </footer>
+</div>
+<script src="assets/comun.js"></script>
+<script>
+document.querySelectorAll("[data-tema]").forEach(function(a){
+  var m=Repaso.marcas(a.dataset.tema),v=Object.values(m),ok=v.filter(function(x){return x==="ok"}).length;
+  a.querySelector(".progreso").textContent=v.length?ok+" de "+a.dataset.total+" preguntas bien":"Sin empezar";
+});
+</script>
+</body>
+</html>

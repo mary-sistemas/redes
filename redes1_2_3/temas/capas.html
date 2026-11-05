@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Capas y protocolos · Repaso de Redes</title>
+<meta name="description" content="OSI y TCP/IP, encapsulamiento, qué cambia en cada salto, TCP frente a UDP y números de protocolo.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT2 · Arquitecturas y protocolos</span>
+  <h1>Capas y protocolos</h1>
+  <p>Cómo viaja un mensaje de tu PC a un servidor web: quién añade cada cabecera, qué toca cada aparato y qué número identifica cada protocolo. Toca, avanza y comprueba.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#idea">La idea</a>
+  <a class="chip" href="#modelo">OSI y TCP/IP</a>
+  <a class="chip" href="#encapsulado">Encapsulamiento</a>
+  <a class="chip" href="#viaje">Saltos</a>
+  <a class="chip" href="#tcpudp">TCP y UDP</a>
+  <a class="chip" href="#numeros">Números</a>
+  <a class="chip" href="#dispositivos">Aparatos</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+<!-- 1. idea -->
+<section id="idea">
+  <span class="eyebrow">La idea</span>
+  <h2>Mandar un paquete por mensajería</h2>
+  <p>Cuando envías algo por mensajería, cada persona de la cadena solo se ocupa de su parte y pone su propia etiqueta. Las redes funcionan igual: cada capa añade una cabecera con la información que necesita, y la capa equivalente del otro extremo es la única que la lee.</p>
+  <div class="analog">
+    <div><strong>Tú escribes la carta</strong>Aplicación: el contenido (la petición web).</div>
+    <div><strong>Pones a qué persona va</strong>Transporte: el puerto dice a qué programa entregarlo.</div>
+    <div><strong>Pones la dirección postal</strong>Red: la IP, el destino final. No cambia en todo el viaje.</div>
+    <div><strong>Etiqueta de la furgoneta</strong>Enlace: la MAC, solo para el tramo actual. Cambia en cada reparto.</div>
+    <div><strong>La carretera</strong>Física: bits por el cable o por el aire.</div>
+  </div>
+</section>
+
+<!-- 2. modelo -->
+<section id="modelo">
+  <span class="eyebrow">OSI y TCP/IP</span>
+  <h2>Las capas, una a una</h2>
+  <p class="lead">Pulsa una capa del modelo OSI para ver qué hace, cómo se llama su PDU, qué protocolos y qué aparatos trabajan en ella.</p>
+  <div class="modelo">
+    <div class="stack" id="stack" role="group" aria-label="Capas OSI y TCP/IP"></div>
+    <div class="panel det" id="det" aria-live="polite"></div>
+  </div>
+  <div class="note"><b>Truco para el orden (de 7 a 1):</b> «<b>A</b>quel <b>P</b>rofe <b>S</b>iempre <b>T</b>rae <b>R</b>egalos <b>E</b>n <b>F</b>iestas» → Aplicación, Presentación, Sesión, Transporte, Red, Enlace, Física.</div>
+</section>
+
+<!-- 3. encapsulado -->
+<section id="encapsulado">
+  <span class="eyebrow">Simulador 1</span>
+  <h2>Encapsulamiento: de datos a bits</h2>
+  <p class="lead">Tu PC (192.168.86.25) pide una web. Avanza y mira cómo cada capa añade su cabecera delante (y la de enlace, también el FCS detrás).</p>
+  <div class="panel" style="display:grid;gap:14px">
+    <div class="pduname"><span class="eyebrow" id="encCapa"></span><span class="big" id="encPdu"></span></div>
+    <div class="pdu-scroll"><div class="pdu" id="pdu"></div></div>
+    <p id="encTxt"></p>
+    <div class="stepper">
+      <button class="btn" id="encPrev">← Anterior</button>
+      <button class="btn pri" id="encNext">Siguiente capa →</button>
+      <div class="dots" id="encDots" aria-hidden="true"></div>
+    </div>
+  </div>
+  <div class="note">Al <b>recibir</b> se hace al revés (desencapsulamiento): cada capa quita su cabecera, la lee y pasa el resto hacia arriba. El número de cada cabecera dice a quién entregarlo: EtherType <code>0x0800</code> → IPv4, Protocolo <code>6</code> → TCP, puerto <code>80</code> → servidor web.</div>
+</section>
+
+<!-- 4. viaje -->
+<section id="viaje">
+  <span class="eyebrow">Simulador 2 · el que más cae en el examen</span>
+  <h2>¿Qué cambia en cada salto?</h2>
+  <p class="lead">Pulsa cada punto del camino. Las filas en rojo son las que han cambiado respecto al tramo anterior.</p>
+  <div class="panel" style="display:grid;gap:14px">
+    <div class="ruta" id="ruta"></div>
+    <div class="tbl-scroll"><table class="campos" id="campos"></table></div>
+    <p id="viajeTxt"></p>
+  </div>
+  <div class="note warn"><b>Para el V/F:</b> el router cambia <b>las dos MAC</b> (origen y destino) y baja el TTL en 1. La IP y los puertos siguen igual. El switch no cambia nada. En casa el router además hace NAT y cambia la IP de origen privada por la pública; si el enunciado no habla de NAT, las IP no cambian.</div>
+</section>
+
+<!-- 5. tcp udp -->
+<section id="tcpudp">
+  <span class="eyebrow">Capa de transporte</span>
+  <h2>TCP frente a UDP</h2>
+  <p class="lead">TCP es una llamada de teléfono: primero confirmas que el otro está, y si algo no llega, se repite. UDP es lanzar postales: rápido, sin saludo y sin confirmación.</p>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:10px">
+      <h3>TCP · orientado a conexión</h3>
+      <div class="hs" id="hsTcp"><span class="end">Cliente</span><span></span><span class="end">Servidor</span></div>
+      <div class="stepper"><button class="btn pri" id="tcpNext">Enviar siguiente</button><button class="btn" id="tcpReset">Reiniciar</button></div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
+      <h3>UDP · sin conexión</h3>
+      <div class="hs" id="hsUdp"><span class="end">Cliente</span><span></span><span class="end">Servidor DNS</span></div>
+      <div class="stepper"><button class="btn pri" id="udpNext">Enviar</button><button class="btn" id="udpReset">Reiniciar</button></div>
+    </div>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th></th><th>TCP</th><th>UDP</th></tr></thead>
+    <tbody>
+      <tr><th>Conexión</th><td>Sí, saludo en 3 pasos: SYN, SYN-ACK, ACK</td><td>No, envía directamente</td></tr>
+      <tr><th>Fiabilidad</th><td>Confirma (ACK), reenvía lo perdido y ordena</td><td>No confirma ni reenvía</td></tr>
+      <tr><th>Velocidad</th><td>Más lento, cabecera de 20 bytes</td><td>Más rápido, cabecera de 8 bytes</td></tr>
+      <tr><th>PDU</th><td>Segmento</td><td>Datagrama</td></tr>
+      <tr><th>Protocolo en IP</th><td class="n">6</td><td class="n">17</td></tr>
+      <tr><th>Ejemplos</th><td>HTTP/HTTPS, FTP, SSH, SMTP, correo</td><td>DNS, DHCP, streaming, VoIP, juegos online</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Cómo razonarlo:</b> si perder un trozo estropea el resultado (una web, un archivo), TCP. Si importa más llegar a tiempo que llegar completo (voz, vídeo en directo) o el mensaje es tan corto que repetirlo es más barato que saludar (DNS), UDP.</div>
+</section>
+
+<!-- 6. números -->
+<section id="numeros">
+  <span class="eyebrow">Números que identifican protocolos</span>
+  <h2>EtherType, campo Protocolo y puertos</h2>
+  <p class="lead">Cada cabecera lleva un número que dice qué hay dentro. Son los que verás en Wireshark.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Dónde está</th><th>Valor</th><th>Significa</th></tr></thead>
+    <tbody>
+      <tr><td>Trama Ethernet → EtherType</td><td class="n">0x0800</td><td>Dentro va IPv4</td></tr>
+      <tr><td></td><td class="n">0x0806</td><td>Dentro va ARP</td></tr>
+      <tr><td></td><td class="n">0x86DD</td><td>Dentro va IPv6</td></tr>
+      <tr><td>Paquete IP → Protocolo</td><td class="n">1</td><td>ICMP (ping)</td></tr>
+      <tr><td></td><td class="n">6</td><td>TCP</td></tr>
+      <tr><td></td><td class="n">17</td><td>UDP</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel flash">
+    <div class="filtros" role="group" aria-label="Qué practicar">
+      <button class="chip on" data-f="todo">Todo</button>
+      <button class="chip" data-f="puerto">Puertos</button>
+      <button class="chip" data-f="cab">Cabeceras</button>
+    </div>
+    <span class="eyebrow" id="fcTipo"></span>
+    <div class="q" id="fcQ"></div>
+    <div class="a" id="fcA" hidden></div>
+    <div class="stepper"><button class="btn pri" id="fcVer">Ver respuesta</button><button class="btn" id="fcOtra">Otra</button></div>
+  </div>
+</section>
+
+<!-- 7. dispositivos -->
+<section id="dispositivos">
+  <span class="eyebrow">Aparatos</span>
+  <h2>¿Hasta qué capa «mira» cada aparato?</h2>
+  <p class="lead">Un aparato trabaja en la capa más alta cuya cabecera tiene que leer para hacer su trabajo.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Aparato</th><th>Capa</th><th>Qué lee</th><th>Qué hace con ella</th></tr></thead>
+    <tbody>
+      <tr><td>Cable, repetidor, hub</td><td><span class="tag" style="border-color:var(--l1)">1 Física</span></td><td>Nada, solo señal</td><td>Repite los bits por todos los puertos</td></tr>
+      <tr><td>Tarjeta de red (NIC)</td><td><span class="tag" style="border-color:var(--l2)">1-2</span></td><td>MAC destino</td><td>Acepta la trama si es suya o de difusión</td></tr>
+      <tr><td>Switch, punto de acceso</td><td><span class="tag" style="border-color:var(--l2)">2 Enlace</span></td><td>MAC destino</td><td>Reenvía solo por el puerto correcto. No modifica la trama</td></tr>
+      <tr><td>Router</td><td><span class="tag" style="border-color:var(--l3)">3 Red</span></td><td>IP destino</td><td>Elige la ruta, crea una trama nueva (MAC nuevas) y baja el TTL</td></tr>
+      <tr><td>PC, servidor</td><td><span class="tag" style="border-color:var(--l7)">1 a 7</span></td><td>Todo</td><td>Encapsula y desencapsula completo</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 8. comprueba -->
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="../index.html">← Volver a todos los temas</a>
+  <span class="eyebrow">Siguiente tema: próximamente</span>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/capas.js"></script>
+</body>
+</html>
