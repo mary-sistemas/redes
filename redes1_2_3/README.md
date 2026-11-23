@@ -2,14 +2,13 @@
 
 Web interactiva para repasar el módulo de **Planificación y Administración de Redes** de ASIR (unidades 1 a 3). Cada tema explica el porqué con analogías, incluye simuladores paso a paso y termina con preguntas tipo examen para autoevaluarse.
 
-**Ver la web:** `https://mary-sistemas.github.io/repaso-redes/`
+**Ver la web:** https://mary-sistemas.github.io/redes/redes1_2_3/
 
 ## Temas
 
 | Unidad | Tema | Estado |
 |---|---|---|
 | UT1 | Sistemas de numeración | Próximamente |
-| UT1 | Puertas lógicas | Próximamente |
 | UT1 | Redes locales y medios | Próximamente |
 | UT2 | Capas y protocolos | ✅ Disponible |
 | UT2 | Wireshark y tramas | Próximamente |

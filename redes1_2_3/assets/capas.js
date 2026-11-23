@@ -153,6 +153,9 @@ function drawPregs(){
   document.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{marcas[b.dataset.m]=b.dataset.v;Repaso.guardaMarcas("capas",marcas);
     b.parentNode.querySelectorAll("[data-m]").forEach(x=>x.classList.toggle("on",x===b));marcador()});
 }
-$("#borrar").onclick=()=>{marcas={};Repaso.guardaMarcas("capas",marcas);drawPregs();marcador()};
+let todas=false;
+function pintaTodas(){$("#verTodas").textContent=todas?"Ocultar todas las respuestas":"Ver todas las respuestas"}
+$("#verTodas").onclick=()=>{todas=!todas;pregs.forEach((_,i)=>{$("#s"+i).hidden=!todas;$("#e"+i).hidden=!todas;document.querySelector(`[data-ver="${i}"]`).disabled=todas});pintaTodas()};
+$("#borrar").onclick=()=>{marcas={};Repaso.guardaMarcas("capas",marcas);drawPregs();marcador();todas=false;pintaTodas()};
 drawPregs();marcador();
 })();
