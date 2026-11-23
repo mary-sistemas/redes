@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ethernet, dominios y EtherChannel · Repaso de Redes</title>
+<meta name="description" content="Dominios de colisión y de broadcast animados, CSMA/CD, normas Ethernet y agregación de enlaces.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT4 · La capa de enlace</span>
+  <h1>Ethernet, dominios y EtherChannel</h1>
+  <p>Quién se entera de cada trama y a quién afecta una colisión: lo vas a ver moverse. Además, cómo se leen los nombres de las normas Ethernet y qué gana uno juntando varios cables en un EtherChannel.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#conceptos">Los dos dominios</a>
+  <a class="chip" href="#red">La red del ejercicio 5</a>
+  <a class="chip" href="#csma">CSMA/CD</a>
+  <a class="chip" href="#normas">Normas</a>
+  <a class="chip" href="#etherchannel">EtherChannel</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+<section id="conceptos">
+  <span class="eyebrow">La idea</span>
+  <h2>Dos preguntas distintas</h2>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:6px;border-top:4px solid var(--l7)"><h3>Dominio de colisión</h3><p>¿<b>Con quién comparto el cable</b>? Los equipos de un mismo medio compartido: si transmiten a la vez, chocan.</p><p class="marcador">Lo corta: switch (uno por puerto) y router.</p></div>
+    <div class="panel" style="display:grid;gap:6px;border-top:4px solid var(--l3)"><h3>Dominio de broadcast</h3><p>¿<b>A quién le llega mi «¡hola a todos!»</b>? Los equipos que reciben un broadcast enviado por cualquiera de ellos.</p><p class="marcador">Lo corta: solo el router (o las VLAN).</p></div>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Dispositivo</th><th>Capa</th><th>Dominios de colisión</th><th>Dominios de broadcast</th></tr></thead>
+    <tbody>
+      <tr><td>Hub o repetidor</td><td>1</td><td>No separa: todos sus puertos son uno</td><td>No separa</td></tr>
+      <tr><td>Puente o switch</td><td>2</td><td><b>Uno por puerto</b></td><td>No separa (las VLAN sí)</td></tr>
+      <tr><td>Router</td><td>3</td><td>Uno por interfaz</td><td><b>Uno por interfaz</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>En full-dúplex no hay colisiones, pero los dominios se cuentan igual</b>: uno por cada enlace de switch o router. Ejemplo de la teoría: dos switches con 5 y 4 PC = 5 + 4 + 1 (el enlace entre ellos) = 10 dominios de colisión y 1 de broadcast.</div>
+  <div class="note warn"><b>Un dominio de broadcast grande es un problema:</b> cada ARP o DHCP interrumpe a todos los equipos y gasta ancho de banda. Se divide con routers o VLAN.</div>
+</section>
+
+<section id="red">
+  <span class="eyebrow">Simulador 1 · ejercicio 5 · velo moverse</span>
+  <h2>Colorea los dominios y lanza tramas</h2>
+  <p class="lead">Es la red del ejercicio 5. Pulsa los botones: se colorea cada dominio y verás animado quién recibe un broadcast y a quién afecta una colisión. Prueba también a cambiar el hub por un switch.</p>
+  <div class="panel escena" style="display:grid;gap:12px">
+    <div class="filtros" role="group">
+      <button class="chip" id="vCol">Dominios de colisión</button>
+      <button class="chip" id="vBro">Dominios de broadcast</button>
+      <button class="chip" id="vNada">Sin colores</button>
+      <button class="chip" id="vHub">Cambiar HUB1 por un switch</button>
+    </div>
+    <svg id="domSvg" viewBox="0 0 680 330" role="img" aria-label="Red del ejercicio 5"></svg>
+    <div class="subt" id="domTxt" aria-live="polite"></div>
+    <div class="stepper">
+      <button class="btn pri" id="aBro">▶ PC1 envía un broadcast</button>
+      <button class="btn pri" id="aCol">▶ PC1 y PC2 transmiten a la vez</button>
+      <button class="btn" id="aUni">▶ PC1 → PC5 (unicast)</button>
+    </div>
+  </div>
+</section>
+
+<section id="csma">
+  <span class="eyebrow">Ethernet compartido</span>
+  <h2>CSMA/CD en 4 pasos</h2>
+  <div class="capas-tela">
+    <div style="--c:var(--l4)"><strong>1. Escuchar</strong>Antes de transmitir, el equipo escucha el medio.</div>
+    <div style="--c:var(--l6)"><strong>2. Interrumpir</strong>Si detecta una colisión, deja de enviar.</div>
+    <div style="--c:var(--l7)"><strong>3. Señal de atasco</strong>Emite una señal de jam para que todos se enteren.</div>
+    <div style="--c:var(--l2)"><strong>4. Reintentar</strong>Espera un tiempo aleatorio y vuelve a intentarlo.</div>
+  </div>
+  <div class="note">Ethernet ha pasado de <b>bus, half-dúplex y CSMA/CD</b> a <b>estrella conmutada, full-dúplex y sin colisiones</b>, manteniendo el mismo formato de trama. Por eso equipos de generaciones distintas se entienden, y la <b>autonegociación</b> pone de acuerdo velocidad y dúplex.</div>
+</section>
+
+<section id="normas">
+  <span class="eyebrow">Simulador 2 · ejercicio 6</span>
+  <h2>Normas IEEE 802.3</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Norma</th><th>Enmienda</th><th>Velocidad</th><th>Medio</th></tr></thead>
+    <tbody>
+      <tr><td class="n">10BASE-T</td><td>802.3i (1990)</td><td>10 Mbps</td><td>Par trenzado Cat 3</td></tr>
+      <tr><td class="n">100BASE-TX</td><td>802.3u (1995)</td><td>100 Mbps</td><td>Par trenzado Cat 5</td></tr>
+      <tr><td class="n">100BASE-FX</td><td>802.3u (1995)</td><td>100 Mbps</td><td>Fibra multimodo, hasta 2 km en full-dúplex</td></tr>
+      <tr><td class="n">1000BASE-SX</td><td>802.3z (1998)</td><td>1 Gbps</td><td>Fibra <b>multimodo</b> (hasta 550 m) · S = Short</td></tr>
+      <tr><td class="n">1000BASE-LX</td><td>802.3z (1998)</td><td>1 Gbps</td><td>Fibra <b>monomodo</b> (hasta 5 km) · L = Long</td></tr>
+      <tr><td class="n">1000BASE-T</td><td>802.3ab (1999)</td><td>1 Gbps</td><td>Par trenzado Cat 5e</td></tr>
+      <tr><td class="n">10GBASE-T</td><td>802.3an (2006)</td><td>10 Gbps</td><td>Par trenzado Cat 6A</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel reto">
+    <div class="q" id="norQ"></div>
+    <div class="opciones" id="norOps"></div>
+    <p id="norFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="norOtra">Otra</button><span class="marcador" id="norCuenta"></span></div>
+  </div>
+</section>
+
+<section id="etherchannel">
+  <span class="eyebrow">Simulador 3 · ejercicio 7 · velo moverse</span>
+  <h2>EtherChannel: varios cables, un enlace</h2>
+  <p>La <b>agregación de enlaces</b> junta varios enlaces físicos entre dos equipos en <b>un único enlace lógico</b>. En Cisco se llama <b>EtherChannel</b> y la interfaz lógica, <b>Port-channel</b>.</p>
+  <div class="panel escena" style="display:grid;gap:12px">
+    <svg id="ecSvg" viewBox="0 0 680 220" role="img" aria-label="EtherChannel entre dos switches"></svg>
+    <div class="subt" id="ecTxt" aria-live="polite"></div>
+    <div class="stepper">
+      <button class="btn pri" id="ecPlay">▶ Varias conversaciones</button>
+      <button class="btn" id="ecCorta">Cortar un enlace</button>
+      <button class="btn" id="ecArregla">Arreglarlo</button>
+    </div>
+  </div>
+  <div class="capas-tela">
+    <div style="--c:var(--l4)"><strong>Más ancho de banda</strong>La capacidad del enlace lógico es la suma: 3 × 100 Mbps = 300 Mbps.</div>
+    <div style="--c:var(--l3)"><strong>Redundancia</strong>Si un enlace falla, el tráfico sigue por los demás sin cortes.</div>
+    <div style="--c:var(--l2)"><strong>Sin bloqueo por STP</strong>STP ve el grupo como un solo enlace y no bloquea ninguno de sus puertos.</div>
+  </div>
+  <div class="note warn"><b>Una conversación, un enlace:</b> cada conversación va por un solo cable físico. Un PC de 100 Mbps copiando a un servidor no pasa de 100 Mbps aunque el Port-channel sume 300. Y todos los puertos del grupo deben tener <b>la misma velocidad, el mismo dúplex y la misma configuración</b>: no se puede mezclar un enlace de 1 Gbps con tres de 100 Mbps.</div>
+</section>
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="tramas.html">← Anterior: Tramas y direcciones MAC</a>
+  <a href="conmutador.html">Siguiente: El conmutador →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/dominios.js"></script>
+</body>
+</html>

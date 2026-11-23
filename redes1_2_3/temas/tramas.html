@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tramas y direcciones MAC · Repaso de Redes</title>
+<meta name="description" content="Funciones de la capa de enlace, direcciones MAC (OUI, bits I/G y U/L), unicast, multicast y broadcast, campos y tamaño de la trama Ethernet.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT4 · La capa de enlace</span>
+  <h1>Tramas y direcciones MAC</h1>
+  <p>Qué hace la capa 2, cómo se lee una dirección MAC bit a bit, quién acepta cada trama y cómo se separan los campos de una trama Ethernet aunque te la den en binario.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#idea">La idea</a>
+  <a class="chip" href="#funciones">Funciones</a>
+  <a class="chip" href="#mac">La dirección MAC</a>
+  <a class="chip" href="#analiza">Analiza una MAC</a>
+  <a class="chip" href="#tipos">Unicast, multicast, broadcast</a>
+  <a class="chip" href="#trama">La trama</a>
+  <a class="chip" href="#tamano">Tamaño y relleno</a>
+  <a class="chip" href="#tipo">¿Tipo o longitud?</a>
+  <a class="chip" href="#binario">Trama en binario</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+<section id="idea">
+  <span class="eyebrow">La idea</span>
+  <h2>La capa 2 trabaja salto a salto</h2>
+  <p>El objetivo del nivel de enlace es <b>llevar tramas entre dos equipos conectados al mismo medio</b>, para que la capa de red no tenga que preocuparse de si debajo hay cable, fibra o Wi-Fi. Una trama <b>solo vive dentro de su red local</b>: cuando llega a un router, este la desmonta y crea otra nueva, con otras MAC, para el siguiente salto.</p>
+  <div class="note"><b>Analogía:</b> la IP es la dirección postal del paquete, que no cambia. La trama es la etiqueta de la furgoneta de reparto de cada tramo: en cada nave (router) la quitan y ponen una nueva.</div>
+</section>
+
+<section id="funciones">
+  <span class="eyebrow">Qué hace</span>
+  <h2>Funciones del nivel de enlace</h2>
+  <div class="capas-tela">
+    <div style="--c:var(--l2)"><strong>Entramado</strong>Agrupa los bits en tramas con delimitadores y campos de control.</div>
+    <div style="--c:var(--l7)"><strong>Detección de errores</strong>Añade la FCS al final. Ethernet <b>detecta</b> errores y descarta la trama, pero <b>no los corrige ni retransmite</b>.</div>
+    <div style="--c:var(--l3)"><strong>Direccionamiento físico</strong>Origen y destino en la red local con MAC de 48 bits.</div>
+    <div style="--c:var(--l4)"><strong>Acceso al medio</strong>CSMA/CD en Ethernet compartido, CSMA/CA en Wi-Fi.</div>
+    <div style="--c:var(--l6)"><strong>Control de flujo</strong>En full-dúplex, tramas de pausa (802.3x) para no saturar al receptor.</div>
+    <div style="--c:var(--l5)"><strong>Interfaz con la capa de red</strong>Dice qué protocolo va dentro (IPv4, IPv6, ARP…).</div>
+  </div>
+  <div class="note">Una trama tiene <b>cabecera</b> (direcciones y tipo), <b>carga útil</b> (el paquete de red) y <b>cola</b> (la FCS). En Ethernet II con IP no se usa la cabecera LLC: el protocolo de arriba se indica con el <b>EtherType</b>.</div>
+</section>
+
+<section id="mac">
+  <span class="eyebrow">48 bits</span>
+  <h2>La dirección MAC</h2>
+  <p>Identificador de <b>48 bits (6 bytes)</b> grabado de fábrica en la tarjeta de red y único en el mundo. Los primeros <b>24 bits son el OUI</b> (el fabricante); los otros 24 los asigna el fabricante.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Sistema</th><th>Formato</th></tr></thead>
+    <tbody>
+      <tr><td>Windows</td><td class="n">AA-BB-CC-11-22-33</td></tr>
+      <tr><td>Linux</td><td class="n">aa:bb:cc:11:22:33</td></tr>
+      <tr><td>Cisco</td><td class="n">aabb.cc11.2233</td></tr>
+    </tbody>
+  </table></div>
+  <p>Dos bits del <b>primer byte</b> son especiales. Fíjate en que son los <b>dos de la derecha</b> (los menos significativos):</p>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:6px;border-top:4px solid var(--l7)"><h3>Bit I/G (el último)</h3><p><b>0 = individual</b> (un solo equipo). <b>1 = grupo</b> (multicast o broadcast).</p></div>
+    <div class="panel" style="display:grid;gap:6px;border-top:4px solid var(--l3)"><h3>Bit U/L (el penúltimo)</h3><p><b>0 = universal</b> (grabada por el fabricante). <b>1 = local</b> (asignada por software: máquinas virtuales, Docker…).</p></div>
+  </div>
+  <div class="note"><b>Truco rápido sin pasar a binario:</b> mira la <b>segunda cifra hexadecimal</b>. Si es impar (1, 3, 5, 7, 9, B, D, F) el I/G vale 1 → grupo. Si es 2, 3, 6, 7, A, B, E o F, el U/L vale 1 → local.</div>
+</section>
+
+<section id="analiza">
+  <span class="eyebrow">Simulador 1 · ejercicio 1 de clase</span>
+  <h2>Analiza una MAC</h2>
+  <p class="lead">Escribe una MAC en cualquier formato o pulsa una de las del ejercicio.</p>
+  <div class="panel" style="display:grid;gap:12px">
+    <div class="filtros" id="macEj"></div>
+    <div class="campo"><label>Dirección MAC<input id="macIn" value="5C-F9-DD-47-B2-8A" style="width:22ch" autocomplete="off" spellcheck="false"></label></div>
+    <div id="macRes" style="display:grid;gap:10px"></div>
+  </div>
+</section>
+
+<section id="tipos">
+  <span class="eyebrow">Según el destino</span>
+  <h2>Unicast, multicast y broadcast</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Tipo</th><th>MAC de destino</th><th>Quién la procesa</th><th>Ejemplo</th></tr></thead>
+    <tbody>
+      <tr><td><b>Unicast</b></td><td>La de un único equipo (I/G = 0)</td><td>Solo el destinatario</td><td>Un PC pide una web a un servidor de su red</td></tr>
+      <tr><td><b>Multicast</b></td><td>De grupo (I/G = 1) distinta de FF…</td><td>Los equipos del grupo</td><td>01:00:5E:00:00:05</td></tr>
+      <tr><td><b>Broadcast</b></td><td class="n">FF:FF:FF:FF:FF:FF</td><td>Todos los del dominio de broadcast</td><td>Petición ARP</td></tr>
+    </tbody>
+  </table></div>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:6px"><h3>Modo normal</h3><p>La tarjeta acepta las tramas a <b>su MAC</b>, las de <b>broadcast</b> y las de los <b>grupos multicast</b> a los que pertenece. El resto las descarta sin molestar al sistema.</p></div>
+    <div class="panel" style="display:grid;gap:6px"><h3>Modo promiscuo</h3><p>Acepta <b>todas</b> las tramas que le llegan. Es lo que hacen los analizadores como Wireshark.</p></div>
+  </div>
+  <div class="note warn"><b>La MAC de origen es siempre unicast.</b> Una trama nunca puede llevar FF:FF:FF:FF:FF:FF (ni una multicast) como origen: el origen es siempre un único equipo.</div>
+  <div class="note"><b>Ojo con el modo promiscuo y el switch:</b> conectado a un switch, aunque tu tarjeta sea promiscua, solo te llegan tus tramas, los broadcast y los multicast; el switch no te manda el unicast de los demás. Con un hub sí lo verías todo, porque repite todo por todos los puertos.</div>
+  <div class="panel reto">
+    <span class="eyebrow">Simulador 2 · ejercicio 2</span>
+    <div class="q" id="tipQ"></div>
+    <div class="opciones" id="tipOps"></div>
+    <p id="tipFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="tipOtra">Otra</button><span class="marcador" id="tipCuenta"></span></div>
+  </div>
+</section>
+
+<section id="trama">
+  <span class="eyebrow">Ethernet II e IEEE 802.3</span>
+  <h2>Los campos de la trama</h2>
+  <div class="pdu-scroll"><div class="trama">
+    <div class="gris" style="--c:var(--muted)"><b>Preámbulo</b><span>7 B · 10101010…</span></div>
+    <div class="gris" style="--c:var(--muted)"><b>SFD</b><span>1 B · 10101011</span></div>
+    <div style="--c:var(--l7)"><b>MAC destino</b><span>6 B</span></div>
+    <div style="--c:var(--l6)"><b>MAC origen</b><span>6 B</span></div>
+    <div style="--c:var(--l5)"><b>Tipo o longitud</b><span>2 B</span></div>
+    <div style="--c:var(--l3);flex:1"><b>Datos + relleno</b><span>46 – 1500 B</span></div>
+    <div style="--c:var(--l2)"><b>FCS</b><span>4 B · CRC-32</span></div>
+  </div></div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Campo</th><th>Para qué</th></tr></thead>
+    <tbody>
+      <tr><td>Preámbulo</td><td>10101010 repetido: sincroniza el reloj del receptor</td></tr>
+      <tr><td>SFD</td><td>Start Frame Delimiter, 10101011: el «11» final avisa de que empieza la trama</td></tr>
+      <tr><td>MAC destino / origen</td><td>Receptor (unicast, multicast o broadcast) y emisor</td></tr>
+      <tr><td>Tipo o longitud</td><td>≥ 0x0600 (1536) → EtherType · ≤ 1500 → longitud de los datos (802.3, con LLC detrás)</td></tr>
+      <tr><td>Datos y relleno</td><td>El paquete de red. Si mide menos de 46 bytes se rellena (padding)</td></tr>
+      <tr><td>FCS</td><td>CRC-32 calculado desde la MAC destino hasta los datos. Normalmente no sale en Wireshark: la tarjeta lo comprueba y lo quita</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="tamano">
+  <span class="eyebrow">Simulador 3 · ejercicio 3a</span>
+  <h2>Tamaño de la trama y relleno</h2>
+  <p class="lead">La trama mide de <b>64 a 1518 bytes</b>, contando desde la MAC destino hasta la FCS y <b>sin el preámbulo</b>. Con etiqueta 802.1Q se añaden 4 bytes (máximo 1522). La carga útil máxima (MTU) es 1500.</p>
+  <div class="panel" style="display:grid;gap:12px">
+    <div class="campo">
+      <label>Datos del paquete (bytes)<input id="tamDat" value="20" inputmode="numeric"></label>
+      <label style="flex-direction:row;display:flex;gap:6px;align-items:center"><input type="checkbox" id="tamQ"> Con etiqueta 802.1Q</label>
+    </div>
+    <div class="filtros" id="tamEj"></div>
+    <div class="pdu-scroll"><div class="trama" id="tamBarra"></div></div>
+    <p id="tamRes"></p>
+  </div>
+  <div class="note"><b>¿Por qué un mínimo de 64 bytes?</b> En los enlaces de 10 y 100 Mbps con CSMA/CD, el emisor tiene que seguir transmitiendo cuando le llega la señal de colisión. Si la trama fuese más corta, terminaría de enviarla antes de enterarse del choque y no la repetiría.</div>
+</section>
+
+<section id="tipo">
+  <span class="eyebrow">Simulador 4 · ejercicio 3b</span>
+  <h2>¿EtherType o longitud?</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Valor</th><th>Significa</th></tr></thead>
+    <tbody>
+      <tr><td class="n">0x0800</td><td>IPv4</td></tr><tr><td class="n">0x0806</td><td>ARP</td></tr>
+      <tr><td class="n">0x86DD</td><td>IPv6</td></tr><tr><td class="n">0x8100</td><td>Trama con etiqueta 802.1Q (VLAN)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel reto">
+    <div class="q" id="etQ"></div>
+    <div class="opciones" id="etOps"></div>
+    <p id="etFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="etOtra">Otro</button><span class="marcador" id="etCuenta"></span></div>
+  </div>
+</section>
+
+<section id="binario">
+  <span class="eyebrow">Simulador 5 · ejercicio 3c</span>
+  <h2>Una trama en binario, campo a campo</h2>
+  <p class="lead">Es la trama del ejercicio, pasada a hexadecimal. Pulsa «Separar campos» para colorearla, y pulsa cualquier byte para ver su binario y a qué campo pertenece.</p>
+  <div class="panel" style="display:grid;gap:12px">
+    <div class="bytes" id="binBytes"></div>
+    <div class="stepper"><button class="btn pri" id="binSep">Separar campos</button><button class="btn" id="binReset">Quitar colores</button></div>
+    <p id="binInfo" aria-live="polite">Pulsa un byte.</p>
+    <div id="binTabla"></div>
+  </div>
+</section>
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="estructurado.html">← Anterior: Cableado estructurado (UT3)</a>
+  <a href="dominios.html">Siguiente: Ethernet, dominios y EtherChannel →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/tramas.js"></script>
+</body>
+</html>

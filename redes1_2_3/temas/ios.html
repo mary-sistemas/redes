@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Configurar el switch (Cisco IOS) · Repaso de Redes</title>
+<meta name="description" content="Terminal simulado de un Catalyst 2960: modos, configuración básica, Telnet y SSH, archivos, TFTP, tabla MAC, seguridad de puertos e incidencias.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT4 · La capa de enlace</span>
+  <h1>Configurar el switch (Cisco IOS)</h1>
+  <p>Los cuestionarios de la práctica preguntan qué hace cada comando, qué sale en pantalla y qué error aparece si falta un paso. Aquí tienes un terminal para escribir los comandos de los ejercicios 12 a 18 y ver qué contesta el switch.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#acceso">Formas de acceso</a>
+  <a class="chip" href="#modos">Modos</a>
+  <a class="chip" href="#terminal">Terminal</a>
+  <a class="chip" href="#remoto">Telnet y SSH</a>
+  <a class="chip" href="#archivos">Archivos y TFTP</a>
+  <a class="chip" href="#portsec">Port security</a>
+  <a class="chip" href="#incidencias">Incidencias</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+<section id="acceso">
+  <span class="eyebrow">Cómo llegar al switch</span>
+  <h2>Formas de acceso</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Acceso</th><th>Tipo</th><th>Necesita</th><th>Notas</th></tr></thead>
+    <tbody>
+      <tr><td><b>Consola</b></td><td>Fuera de banda</td><td>Cable de consola y terminal serie: <b>9600 baudios, 8 bits de datos, sin paridad, 1 bit de parada, sin control de flujo</b></td><td>No necesita IP ni red. Obligatoria la primera vez y para recuperar el equipo</td></tr>
+      <tr><td>Telnet</td><td>En banda</td><td>IP de administración y contraseña en las VTY · <b>TCP 23</b></td><td><b>Sin cifrar</b>: la contraseña se ve en la red</td></tr>
+      <tr><td><b>SSH</b></td><td>En banda</td><td>IP de administración, usuario y claves RSA · <b>TCP 22</b></td><td>Cifrado. El método remoto recomendado</td></tr>
+      <tr><td>Web</td><td>En banda</td><td>IP y servidor web · TCP 80 / 443</td><td>Mejor HTTPS: <code>ip http secure-server</code> y <code>no ip http server</code></td></tr>
+      <tr><td>SNMP</td><td>En banda</td><td>IP y comunidad · <b>UDP 161</b></td><td>Monitorizar (y modificar con comunidad de escritura)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Interfaz de administración:</b> un switch de nivel 2 no tiene IP en sus puertos. Para administrarlo en remoto se le da IP a una <b>interfaz virtual (SVI)</b>, la <code>interface vlan 1</code>, porque por defecto todos los puertos están en la VLAN 1. Solo pasa a <b>up</b> si hay al menos un puerto con enlace activo en esa VLAN. Si lo administras desde otra red, falta <code>ip default-gateway</code>.</div>
+</section>
+
+<section id="modos">
+  <span class="eyebrow">La CLI por niveles</span>
+  <h2>Modos de configuración</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Modo</th><th>Indicador</th><th>Cómo se entra</th><th>Para qué</th></tr></thead>
+    <tbody>
+      <tr><td>EXEC de usuario</td><td class="n">Switch&gt;</td><td>Al conectarse</td><td>Consultas muy limitadas</td></tr>
+      <tr><td>EXEC privilegiado</td><td class="n">Switch#</td><td><code>enable</code></td><td>Todos los <code>show</code>, copias de archivos y reinicio</td></tr>
+      <tr><td>Configuración global</td><td class="n">Switch(config)#</td><td><code>configure terminal</code></td><td>Lo que afecta a todo el equipo: nombre, contraseñas…</td></tr>
+      <tr><td>Interfaz</td><td class="n">Switch(config-if)#</td><td><code>interface fa0/1</code></td><td>Un puerto o la interfaz virtual</td></tr>
+      <tr><td>Línea</td><td class="n">Switch(config-line)#</td><td><code>line console 0</code> · <code>line vty 0 15</code></td><td>Acceso por consola y remoto</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><code>exit</code> sube un nivel · <code>end</code> o Ctrl+Z vuelve directo al privilegiado · <code>?</code> ayuda contextual · tabulador completa · se admiten abreviaturas (<code>conf t</code>) · <code>no &lt;comando&gt;</code> deshace · los <code>show</code> no funcionan en modo de configuración (salvo con <code>do show …</code>).</div>
+</section>
+
+<section id="terminal">
+  <span class="eyebrow">Simulador 1 · un Catalyst 2960 para ti</span>
+  <h2>Escribe los comandos</h2>
+  <p class="lead">Red del ejercicio 11: PC1 en Fa0/1, PC2 en Fa0/2, el servidor TFTP (192.168.1.50) en Fa0/3 y SW2 (con PC3 y PC4) en Fa0/24. Pulsa Enter para empezar. Funcionan las abreviaturas, el tabulador, <code>?</code> y las flechas para el historial.</p>
+  <div class="sim-grid">
+    <div style="display:grid;gap:0">
+      <div class="term" id="term" aria-live="polite" tabindex="0"></div>
+      <div class="term-in"><span id="tPrompt"></span><input id="tIn" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Comando"></div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px;align-content:start">
+      <h3>Retos (ejercicios 12 y 13)</h3>
+      <div class="retos-cli" id="retos"></div>
+      <div class="stepper"><button class="btn" id="tReset">Switch de fábrica</button></div>
+    </div>
+  </div>
+  <div class="panel" style="display:grid;gap:10px">
+    <span class="eyebrow">Genera tráfico desde los PC (para la tabla MAC y port security)</span>
+    <div class="stepper" id="trafico">
+      <button class="btn" data-t="PC1,PC2">PC1 ping PC2</button>
+      <button class="btn" data-t="PC1,PC3">PC1 ping PC3</button>
+      <button class="btn" data-t="PC3,PC4">PC3 ping PC4</button>
+      <button class="btn" data-c="PC5">Quitar PC1 y conectar PC5 en Fa0/1</button>
+      <button class="btn" data-t="PC5,PC3">PC5 ping PC3</button>
+      <button class="btn" data-c="PC1">Volver a conectar PC1</button>
+    </div>
+    <p class="subt" id="trafTxt">Prueba <code>show mac address-table</code> antes y después de generar tráfico.</p>
+  </div>
+</section>
+
+<section id="remoto">
+  <span class="eyebrow">Simulador 2 · ejercicio 13 desde PC3</span>
+  <h2>¿Funciona el acceso remoto?</h2>
+  <p class="lead">Configura el switch arriba y prueba aquí. El resultado depende de lo que hayas escrito.</p>
+  <div class="panel" style="display:grid;gap:10px">
+    <div class="stepper"><button class="btn" id="rTel">C:\&gt; telnet 192.168.1.2</button><button class="btn" id="rSsh">C:\&gt; ssh -l admin 192.168.1.2</button></div>
+    <pre class="term" id="rOut" style="height:auto;min-height:80px"></pre>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Comando</th><th>Qué hace</th></tr></thead>
+    <tbody>
+      <tr><td class="n">enable secret X</td><td>Contraseña del modo privilegiado guardada con <b>hash</b> (mejor que <code>enable password</code>, que va en claro)</td></tr>
+      <tr><td class="n">line console 0 · password X · login</td><td>Pide contraseña al conectar por consola. Sin <code>login</code>, la contraseña no se pide</td></tr>
+      <tr><td class="n">line vty 0 15 · password X · login</td><td>16 líneas virtuales para Telnet con contraseña (viaja sin cifrar)</td></tr>
+      <tr><td class="n">username admin secret X</td><td>Crea un usuario local con contraseña cifrada</td></tr>
+      <tr><td class="n">ip domain-name aula.local</td><td>Nombre de dominio, necesario (con el hostname) para generar las claves</td></tr>
+      <tr><td class="n">crypto key generate rsa modulus 2048</td><td>Genera las claves RSA que usa SSH. Falla si el equipo se llama «Switch» o no hay dominio</td></tr>
+      <tr><td class="n">ip ssh version 2</td><td>Obliga a usar SSH v2</td></tr>
+      <tr><td class="n">transport input ssh</td><td>En las VTY: solo SSH, Telnet bloqueado</td></tr>
+      <tr><td class="n">login local</td><td>Pide usuario y contraseña de la base local, no solo una contraseña</td></tr>
+      <tr><td class="n">service password-encryption</td><td>Cifra las contraseñas de línea con un cifrado <b>débil y reversible</b> (tipo 7), solo para que no se lean a simple vista</td></tr>
+      <tr><td class="n">banner motd #texto#</td><td>Aviso antes de pedir la contraseña; # delimita el texto</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="archivos">
+  <span class="eyebrow">Simulador 3 · ejercicios 14, 15 y 16</span>
+  <h2>Archivos, copias y TFTP</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Archivo</th><th>Dónde</th><th>Qué es</th></tr></thead>
+    <tbody>
+      <tr><td class="n">running-config</td><td>RAM</td><td>Configuración activa. <b>Se pierde al reiniciar</b> si no se guarda</td></tr>
+      <tr><td class="n">startup-config</td><td>NVRAM (o flash)</td><td>La que se carga al arrancar</td></tr>
+      <tr><td class="n">c2960-lanbasek9-mz…bin</td><td>Flash</td><td>Imagen del sistema operativo IOS</td></tr>
+      <tr><td class="n">vlan.dat</td><td>Flash</td><td>Base de datos de VLAN, aparte de startup-config</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel escena" style="display:grid;gap:10px">
+    <svg id="arSvg" viewBox="0 0 680 230" role="img" aria-label="Memorias y servidor TFTP"></svg>
+    <div class="filtros" id="arBtns"></div>
+    <div class="subt" id="arTxt">Pulsa un comando y mira hacia dónde va la copia.</div>
+  </div>
+  <div class="note warn"><b>Ojo en los test:</b> <code>copy tftp: running-config</code> <b>fusiona</b>: añade los comandos del archivo a la configuración activa, pero no borra los que ya estaban (la descripción PRUEBA-FUSION se queda). <code>copy tftp: startup-config</code> sí <b>sustituye</b> la guardada, para el próximo arranque. Para dejar el switch de fábrica: <code>erase startup-config</code>, <code>delete flash:vlan.dat</code> y <code>reload</code>.</div>
+  <div class="panel" style="display:grid;gap:10px">
+    <span class="eyebrow">Ordena la actualización del IOS (ejercicio 16)</span>
+    <div class="orden-list" id="actLista"></div>
+    <p id="actFb"></p>
+    <div class="stepper"><button class="btn" id="actReset">Barajar otra vez</button></div>
+  </div>
+</section>
+
+<section id="portsec">
+  <span class="eyebrow">Ejercicios 17 y 18</span>
+  <h2>Tabla MAC y seguridad de puertos</h2>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:6px"><h3>Entrada dinámica</h3><p>La aprende el switch. Se borra tras el <b>aging time</b> (300 s) sin tráfico o con <code>clear mac address-table dynamic</code>.</p></div>
+    <div class="panel" style="display:grid;gap:6px"><h3>Entrada estática</h3><p>La pone el administrador con <code>mac address-table static &lt;MAC&gt; vlan 1 interface fa0/2</code>. No envejece y sobrevive al <code>clear … dynamic</code>.</p></div>
+  </div>
+  <p><b>Port security</b> limita qué MAC pueden usar un puerto de acceso: protege frente a equipos no autorizados, el MAC flooding y, en parte, la suplantación. <b>Solo se aplica en puertos con <code>switchport mode access</code></b>; si no, IOS contesta <code>Command rejected: … is a dynamic port</code>.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Modo de violación</th><th>Tramas del intruso</th><th>Aviso y contador</th><th>Puerto</th></tr></thead>
+    <tbody>
+      <tr><td><b>protect</b></td><td>Descartadas</td><td>Ni aviso ni contador</td><td>Sigue activo</td></tr>
+      <tr><td><b>restrict</b></td><td>Descartadas</td><td>Aviso en el registro y <b>sube el contador</b></td><td>Sigue activo</td></tr>
+      <tr><td><b>shutdown</b> (por defecto)</td><td>Descartadas</td><td>Aviso</td><td>Pasa a <b>err-disabled</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note">Por defecto: <b>máximo 1 MAC</b> y modo <b>shutdown</b>. Con <b>sticky</b> el puerto aprende las MAC que se conectan y las escribe en running-config (hay que guardar para conservarlas). Para recuperar un puerto err-disabled: quitar al intruso y hacer <code>shutdown</code> + <code>no shutdown</code> en la interfaz. Pruébalo en el terminal con los botones de tráfico.</div>
+  <div class="panel reto">
+    <span class="eyebrow">Simulador 4 · ¿qué pasa?</span>
+    <div class="q" id="psQ"></div>
+    <div class="opciones" id="psOps"></div>
+    <p id="psFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="psOtra">Otra</button><span class="marcador" id="psCuenta"></span></div>
+  </div>
+</section>
+
+<section id="incidencias">
+  <span class="eyebrow">Simulador 5 · ejercicio 19</span>
+  <h2>Seguimiento de incidencias</h2>
+  <p class="lead">Siempre de abajo arriba: primero el <b>enlace físico</b>, después la <b>configuración</b> y por último la <b>comunicación</b> entre equipos.</p>
+  <pre class="term" style="height:auto">SW1# show interfaces status
+Port   Name             Status        Vlan  Duplex  Speed  Type
+Fa0/1  PC-Contabilidad  connected     1     a-full  a-100  10/100BaseTX
+Fa0/2  Impresora        notconnect    1     auto    auto   10/100BaseTX
+Fa0/3  Servidor         disabled      1     auto    auto   10/100BaseTX
+Fa0/4  PC-Invitados     err-disabled  1     auto    auto   10/100BaseTX
+Fa0/5  Enlace-SW2       connected     1     half    100    10/100BaseTX
+
+SW1# show interfaces fastEthernet 0/5
+FastEthernet0/5 is up, line protocol is up (connected)
+  Half-duplex, 100Mb/s
+     4378 input errors, 4378 CRC, 0 frame, 0 overrun, 0 ignored
+     912 late collision, 0 deferred</pre>
+  <div class="panel reto">
+    <div class="q" id="incQ"></div>
+    <div class="opciones" id="incOps"></div>
+    <p id="incFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="incOtra">Otra</button><span class="marcador" id="incCuenta"></span></div>
+  </div>
+</section>
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="conmutador.html">← Anterior: El conmutador</a>
+  <a href="stp.html">Siguiente: STP →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/cli.js"></script>
+<script src="../assets/ios.js"></script>
+</body>
+</html>

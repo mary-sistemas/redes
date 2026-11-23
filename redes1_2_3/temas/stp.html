@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>STP · Repaso de Redes</title>
+<meta name="description" content="Por qué los bucles tumban una red de capa 2, cómo STP elige el puente raíz y bloquea puertos, estados y temporizadores, comandos y switches de nivel 3.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT4 · La capa de enlace</span>
+  <h1>STP</h1>
+  <p>Primero vas a ver cómo un bucle convierte un simple broadcast en una tormenta. Luego juegas con prioridades y MAC para decidir quién es el puente raíz y qué puerto se bloquea, y ves pasar los 50 segundos de convergencia.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#bucle">El problema</a>
+  <a class="chip" href="#tormenta">Velo pasar</a>
+  <a class="chip" href="#stp">Cómo lo arregla STP</a>
+  <a class="chip" href="#eleccion">Elige la raíz</a>
+  <a class="chip" href="#estados">Estados y tiempos</a>
+  <a class="chip" href="#comandos">Comandos</a>
+  <a class="chip" href="#versiones">Versiones</a>
+  <a class="chip" href="#nivel3">Switches de nivel 3</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+<section id="bucle">
+  <span class="eyebrow">La idea</span>
+  <h2>Redundancia = bucles</h2>
+  <p>Se ponen <b>enlaces redundantes</b> para que si cae un cable o un switch la red siga funcionando. Pero en capa 2 eso crea <b>bucles</b>, y las tramas Ethernet <b>no tienen TTL</b>: nada las elimina. Un broadcast puede dar vueltas para siempre.</p>
+  <div class="capas-tela">
+    <div style="--c:var(--l7)"><strong>Tormenta de broadcast</strong>Los broadcast y los destinos desconocidos se inundan y dan vueltas; se acumulan hasta saturar enlaces y CPU.</div>
+    <div style="--c:var(--l6)"><strong>Tabla MAC inestable</strong>El mismo equipo se aprende por puertos distintos, porque sus tramas llegan por varios caminos.</div>
+    <div style="--c:var(--l5)"><strong>Tramas duplicadas</strong>El destinatario recibe varias copias de la misma trama.</div>
+  </div>
+  <div class="note"><b>Recuerda de la UT2:</b> los paquetes IP sí tienen TTL y cada router lo baja en 1, así que en capa 3 un bucle acaba muriendo. En capa 2 no existe ese freno: por eso hace falta STP.</div>
+</section>
+
+<section id="tormenta">
+  <span class="eyebrow">Simulador 1 · velo pasar</span>
+  <h2>Un broadcast en un triángulo</h2>
+  <p class="lead">PC1 manda una petición ARP. Mira primero qué pasa sin STP y después con STP activado.</p>
+  <div class="sim-grid">
+    <div class="panel escena" style="display:grid;gap:10px">
+      <svg id="tSvg" viewBox="0 0 640 340" role="img" aria-label="Tres switches en triángulo"></svg>
+      <div class="subt" id="tTxt" aria-live="polite"></div>
+      <div class="stepper"><button class="btn pri" id="tSin">▶ Sin STP</button><button class="btn pri" id="tCon">▶ Con STP</button><button class="btn" id="tStop">Parar</button></div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px;align-content:start">
+      <h3>Contadores</h3>
+      <div class="resul"><div><span>Copias en la red</span><b id="tCop">0</b></div><div><span>Recibidas por PC2</span><b id="tRec">0</b></div></div>
+      <h3>Tabla MAC de SW1 para PC1</h3>
+      <table class="tablamac"><thead><tr><th>MAC</th><th>Puerto</th></tr></thead><tbody id="tMac"><tr><td colspan="2" class="marcador">—</td></tr></tbody></table>
+    </div>
+  </div>
+</section>
+
+<section id="stp">
+  <span class="eyebrow">IEEE 802.1D</span>
+  <h2>Cómo lo arregla STP</h2>
+  <p><b>STP (Spanning Tree Protocol)</b> deja los cables redundantes conectados, pero <b>bloquea lógicamente</b> algunos puertos para que la red activa sea un <b>árbol sin bucles</b>. Si un enlace activo falla, desbloquea el puerto que haga falta.</p>
+  <div class="capas-tela">
+    <div style="--c:var(--l2)"><strong>BPDU</strong>Los mensajes de STP. Van a la multicast <code>01:80:C2:00:00:00</code> cada <b>2 s</b> (hello).</div>
+    <div style="--c:var(--l7)"><strong>BID</strong>Identificador de puente = <b>prioridad + MAC</b>. Prioridad por defecto <b>32768</b>, en múltiplos de 4096. <b>Gana el más bajo</b>; si empatan en prioridad, la MAC más baja.</div>
+    <div style="--c:var(--l4)"><strong>Coste</strong>Suma de los costes de los enlaces hasta la raíz: 10 Mbps = <b>100</b> · 100 Mbps = <b>19</b> · 1 Gbps = <b>4</b> · 10 Gbps = <b>2</b>.</div>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Paso</th><th>Qué se elige</th><th>Regla</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><b>Puente raíz</b></td><td>El de BID más bajo. <b>Todos sus puertos son designados</b></td></tr>
+      <tr><td>2</td><td><b>Puerto raíz (R)</b></td><td>En cada switch no raíz, el puerto con menor coste hasta la raíz (uno por switch)</td></tr>
+      <tr><td>3</td><td><b>Puerto designado (D)</b></td><td>En cada segmento, el del switch con menor coste hasta la raíz; si empatan, el de menor BID</td></tr>
+      <tr><td>4</td><td><b>Bloqueados (B)</b></td><td>El resto: no reenvían datos, pero siguen <b>recibiendo BPDU</b></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="eleccion">
+  <span class="eyebrow">Simulador 2 · ejercicios 20 y 21</span>
+  <h2>Elige el puente raíz</h2>
+  <p class="lead">El triángulo del ejercicio 20. Cambia prioridades, MAC, velocidades o corta enlaces, y STP recalcula al instante. Debajo te explica cada decisión.</p>
+  <div class="sim-grid">
+    <div class="panel escena" style="display:grid;gap:10px">
+      <svg id="eSvg" viewBox="0 0 640 380" role="img" aria-label="Elección de STP"></svg>
+      <div class="stepper" id="eAtajos">
+        <button class="btn" data-a="0">Todo por defecto</button>
+        <button class="btn" data-a="1">SW3: root primary</button>
+        <button class="btn" data-a="2">SW1: root secondary</button>
+        <button class="btn" data-a="3">SW2: priority 4096</button>
+      </div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px;align-content:start" id="eCtl"></div>
+  </div>
+  <div class="subt" id="eTxt" aria-live="polite"></div>
+  <div class="note"><b>¿Por qué no dejar la elección a la suerte?</b> Si todos tienen 32768 gana la MAC más baja, que suele ser la del switch <b>más antiguo</b>, quizá un switch de acceso en una esquina. Lo correcto es que la raíz sea el de <b>distribución o núcleo</b> (el mejor situado y con más capacidad) y dejar otro como raíz de respaldo.</div>
+</section>
+
+<section id="estados">
+  <span class="eyebrow">Simulador 3 · cronómetro</span>
+  <h2>Estados y temporizadores (802.1D)</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Estado</th><th>¿BPDU?</th><th>¿Aprende MAC?</th><th>¿Reenvía datos?</th><th>Duración</th></tr></thead>
+    <tbody>
+      <tr><td><b>Bloqueo</b> (BLK)</td><td>Solo recibe</td><td>No</td><td>No</td><td>Estable</td></tr>
+      <tr><td><b>Escucha</b> (LIS)</td><td>Sí</td><td>No</td><td>No</td><td>15 s (forward delay)</td></tr>
+      <tr><td><b>Aprendizaje</b> (LRN)</td><td>Sí</td><td><b>Sí</b></td><td>No</td><td>15 s</td></tr>
+      <tr><td><b>Reenvío</b> (FWD)</td><td>Sí</td><td>Sí</td><td><b>Sí</b></td><td>Estable</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel" style="display:grid;gap:12px">
+    <div class="filtros" role="group"><button class="chip on" data-esc="nuevo">Puerto recién conectado</button><button class="chip" data-esc="fallo">Falla el camino principal</button></div>
+    <div class="leds" style="gap:14px"><span class="led" id="stLed" style="width:44px;height:44px"></span><span class="secuencia" id="stReloj">0 s</span><span id="stEstado" class="secuencia"></span></div>
+    <div class="timeline" id="stTL"></div>
+    <p class="subt" id="stTxt"></p>
+    <div class="stepper"><button class="btn pri" id="stPlay">▶ Reproducir (acelerado)</button></div>
+  </div>
+  <div class="note"><b>Escucha y aprendizaje son transitorios:</b> se pasan una sola vez y en ese orden cada vez que un puerto tiene que llegar a reenvío; no se repiten cada 15 s. Puerto recién conectado: 15 + 15 = <b>30 s</b> (por eso el LED se queda ámbar). Puerto bloqueado que debe activarse porque cae el camino principal: espera <b>20 s</b> sin BPDU (max age) + 15 + 15 = <b>50 s</b>.</div>
+</section>
+
+<section id="comandos">
+  <span class="eyebrow">Simulador 4 · ejercicio 21</span>
+  <h2>Comandos de STP</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Comando</th><th>Efecto</th></tr></thead>
+    <tbody>
+      <tr><td class="n">spanning-tree vlan 1 priority 4096</td><td>Fija la prioridad a mano (múltiplos de 4096, de 0 a 61440). Menor = más opciones de ser raíz</td></tr>
+      <tr><td class="n">spanning-tree vlan 1 root primary</td><td>Pone <b>24576</b>; si ya hay una raíz con prioridad menor, usa 4096 menos que ella</td></tr>
+      <tr><td class="n">spanning-tree vlan 1 root secondary</td><td>Pone <b>28672</b>: será raíz si cae la principal (si los demás siguen en 32768)</td></tr>
+      <tr><td class="n">show spanning-tree</td><td>Raíz, BID propio, y rol (Root, Desg, Altn) y estado (BLK, LIS, LRN, FWD) de cada puerto</td></tr>
+      <tr><td class="n">show spanning-tree summary</td><td>Modo de STP y número de puertos en cada estado</td></tr>
+      <tr><td class="n">show spanning-tree interface fa0/1</td><td>Rol, estado y coste de ese puerto</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Prioridad mostrada:</b> Cisco enseña la prioridad <b>sumada al número de VLAN</b> (sys-id-ext): 24576 + 1 = <b>24577</b>. Es normal que no coincida con lo configurado. Y <b>This bridge is the root</b> solo aparece en la raíz.</div>
+  <pre class="term" style="height:auto">SW2# show spanning-tree
+VLAN0001
+  Spanning tree enabled protocol ieee
+  Root ID    Priority    24577
+             Address     0060.4752.0003
+             Cost        19
+             Port        2(FastEthernet0/2)
+
+  Bridge ID  Priority    32769  (priority 32768 sys-id-ext 1)
+             Address     0030.F2A1.0002
+
+Interface        Role Sts Cost      Prio.Nbr Type
+---------------- ---- --- --------- -------- ----------
+Fa0/1            Altn BLK 19        128.1    P2p
+Fa0/2            Root FWD 19        128.2    P2p
+Fa0/3            Desg FWD 19        128.3    P2p</pre>
+  <div class="panel reto">
+    <div class="q" id="shQ"></div>
+    <div class="opciones" id="shOps"></div>
+    <p id="shFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="shOtra">Otra</button><span class="marcador" id="shCuenta"></span></div>
+  </div>
+</section>
+
+<section id="versiones">
+  <span class="eyebrow">Evoluciones</span>
+  <h2>Versiones de STP</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Protocolo</th><th>Estándar</th><th>Características</th></tr></thead>
+    <tbody>
+      <tr><td><b>STP</b></td><td>802.1D</td><td>Convergencia lenta: 30 a 50 s</td></tr>
+      <tr><td><b>RSTP</b> (Rapid STP)</td><td>802.1w</td><td>Converge en pocos segundos</td></tr>
+      <tr><td><b>PVST+</b></td><td>Cisco</td><td><b>Un árbol por cada VLAN</b>; por defecto en Cisco (por eso los comandos llevan «vlan 1»). Basado en STP, lento; existe Rapid PVST+</td></tr>
+      <tr><td><b>MSTP</b></td><td>802.1s</td><td>Agrupa varias VLAN en pocas instancias de STP</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="nivel3">
+  <span class="eyebrow">Para terminar la UT4</span>
+  <h2>Switches de nivel 3</h2>
+  <p>Un <b>switch de nivel 3</b> (multicapa) también <b>enruta</b>: reenvía paquetes entre redes según la IP, como un router. Su ventaja es que lo hace <b>a velocidad de conmutación, por hardware (ASIC)</b>, por eso se usa en distribución y núcleo.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th></th><th>Switch de nivel 2</th><th>Switch de nivel 3</th><th>Router</th></tr></thead>
+    <tbody>
+      <tr><th>Reenvía según</th><td>MAC</td><td>MAC dentro de una red, IP entre redes</td><td>IP</td></tr>
+      <tr><th>Dominios de broadcast</th><td>No los separa</td><td>Los separa en las interfaces enrutadas</td><td>Uno por interfaz</td></tr>
+      <tr><th>Funciones WAN</th><td>No</td><td>Limitadas</td><td>Completas</td></tr>
+      <tr><th>Uso típico</th><td>Acceso</td><td>Distribución y núcleo</td><td>Salida a Internet, entre sedes</td></tr>
+    </tbody>
+  </table></div>
+  <p>Tiene puertos de <b>capa 2</b> (conmutan por MAC) y puertos <b>enrutados</b> de capa 3 (con IP, sin conmutación). El enrutamiento hay que activarlo. En Packet Tracer: el modelo 3560-24PS.</p>
+</section>
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="ios.html">← Anterior: Configurar el switch (Cisco IOS)</a>
+  <a href="../index.html">Volver a todos los temas →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/stp.js"></script>
+</body>
+</html>

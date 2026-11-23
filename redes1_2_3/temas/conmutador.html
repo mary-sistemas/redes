@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>El conmutador · Repaso de Redes</title>
+<meta name="description" content="Tipos de switch, cómo aprende la tabla MAC (animado), reenvío, inundación y filtrado, métodos de reenvío, arranque, memorias y LED.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT4 · La capa de enlace</span>
+  <h1>El conmutador</h1>
+  <p>El corazón de la UT4: mira cómo un switch aprende quién está en cada puerto trama a trama, cuándo reenvía, cuándo inunda y cuándo filtra, y qué método usa para reenviar.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#que">¿Qué es?</a>
+  <a class="chip" href="#tipos">Tipos</a>
+  <a class="chip" href="#segmentar">Segmentar</a>
+  <a class="chip" href="#tabla">La tabla MAC</a>
+  <a class="chip" href="#animacion">Velo aprender</a>
+  <a class="chip" href="#reenvio">Métodos de reenvío</a>
+  <a class="chip" href="#arranque">Arranque y memorias</a>
+  <a class="chip" href="#led">LED y conexión</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+<section id="que">
+  <span class="eyebrow">La idea</span>
+  <h2>Un puente con muchos puertos</h2>
+  <p>Un <b>conmutador (switch)</b> es un dispositivo de <b>capa 2</b> que funciona como un puente multipuerto: reenvía cada trama <b>solo por el puerto donde está el destinatario</b>. El hub, en cambio, la repite por todos.</p>
+  <div class="note"><b>Analogía:</b> el hub es un megáfono: lo que dice uno lo oyen todos. El switch es una centralita que va apuntando en qué extensión está cada persona y pasa cada llamada solo a quien toca.</div>
+</section>
+
+<section id="tipos">
+  <span class="eyebrow">Simulador 1 · ejercicio 8</span>
+  <h2>Tipos de conmutadores</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Criterio</th><th>Tipos</th></tr></thead>
+    <tbody>
+      <tr><td>Velocidad</td><td>Fast Ethernet, Gigabit, multigigabit (2,5/5/10), 10G o más. Lo habitual: acceso Gigabit con uplinks de 10G</td></tr>
+      <tr><td>Gestión</td><td><b>No gestionables</b> (se enchufan y funcionan) · gestionables por web (smart) y completos (consola, SSH, web, SNMP)</td></tr>
+      <tr><td>Ubicación</td><td><b>Acceso</b> (muchos puertos, PoE) · <b>distribución y núcleo</b> (agregan y transportan a alta velocidad)</td></tr>
+      <tr><td>PoE</td><td>Con o sin PoE (802.3af/at/bt): alimentan AP, cámaras IP y teléfonos</td></tr>
+      <tr><td>Capa</td><td><b>Nivel 2</b> o <b>nivel 3</b> (también enrutan)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel reto">
+    <div class="q" id="tswQ"></div>
+    <div class="opciones" id="tswOps"></div>
+    <p id="tswFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="tswOtra">Otra</button><span class="marcador" id="tswCuenta"></span></div>
+  </div>
+</section>
+
+<section id="segmentar">
+  <span class="eyebrow">Microsegmentación</span>
+  <h2>Hub frente a switch</h2>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:6px"><h3>48 equipos en un hub de 100 Mbps</h3><p>Comparten esos 100 Mbps y chocan entre sí: en el peor caso, <b>unos 2 Mbps por equipo</b>.</p></div>
+    <div class="panel" style="display:grid;gap:6px"><h3>48 equipos en un switch de 100 Mbps</h3><p>Cada puerto es su propio dominio de colisión y, en full-dúplex, sin colisiones: <b>100 Mbps para cada uno</b>.</p></div>
+  </div>
+  <p><b>Segmentar</b> es dividir la red en partes más pequeñas: con switches se dividen los dominios de colisión; con routers o VLAN, los de broadcast. Ventajas: <b>rendimiento</b> (el tráfico local se queda en su segmento), <b>contención de fallos</b>, <b>seguridad</b> (no ves el unicast de los demás) y <b>administración</b> más sencilla.</p>
+</section>
+
+<section id="tabla">
+  <span class="eyebrow">Tabla MAC o CAM</span>
+  <h2>Qué hace el switch con cada trama</h2>
+  <p>La <b>tabla MAC</b> (o CAM, Content Addressable Memory) relaciona <b>MAC, puerto y VLAN</b>. No se configura: el switch la construye solo mirando el tráfico.</p>
+  <div class="capas-tela">
+    <div style="--c:var(--l4)"><strong>1. Aprende</strong>Apunta la <b>MAC de origen</b> con el puerto por el que ha llegado (o renueva su temporizador).</div>
+    <div style="--c:var(--l2)"><strong>2. Decide</strong>Mira la <b>MAC de destino</b>: reenvía, inunda o filtra.</div>
+    <div style="--c:var(--l7)"><strong>3. Envejece</strong>Si una entrada no se renueva en <b>300 s</b> (por defecto en Cisco), se borra.</div>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>La MAC de destino…</th><th>Acción</th></tr></thead>
+    <tbody>
+      <tr><td>Está en la tabla, en otro puerto</td><td><b>Reenvía</b> solo por ese puerto</td></tr>
+      <tr><td>No está en la tabla (unicast desconocido)</td><td><b>Inunda</b>: por todos los puertos menos el de entrada</td></tr>
+      <tr><td>Está en el mismo puerto por el que llegó</td><td><b>Filtra</b> (la descarta): el destinatario ya la ha recibido en su segmento</td></tr>
+      <tr><td>Es broadcast o multicast</td><td><b>Inunda</b> por todos los puertos menos el de entrada</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>Fíjate:</b> el switch aprende siempre de la MAC de <b>origen</b>, nunca de la de destino. Por eso, para aprender dónde está B, B tiene que <b>enviar</b> algo.</div>
+</section>
+
+<section id="animacion">
+  <span class="eyebrow">Simulador 2 · ejercicio 9 · velo moverse</span>
+  <h2>Mira cómo aprende la tabla</h2>
+  <p class="lead">A en el puerto 1, B en el 2, y C y D comparten el puerto 3 a través de un hub. Pulsa <b>▶ Reproducir el ejercicio 9</b> para ver los 6 pasos como un vídeo, o manda tus propias tramas.</p>
+  <div class="sim-grid">
+    <div class="panel escena" style="display:grid;gap:10px">
+      <svg id="swSvg" viewBox="0 0 640 340" role="img" aria-label="Switch de tres puertos"></svg>
+      <div class="subt" id="swTxt" aria-live="polite"></div>
+      <div class="stepper">
+        <button class="btn pri" id="swPlay">▶ Reproducir el ejercicio 9</button>
+        <button class="btn" id="swReset">Vaciar la tabla</button>
+        <label class="marcador" style="display:flex;gap:6px;align-items:center">Velocidad <select id="swVel"><option value="0.6">lenta</option><option value="1" selected>normal</option><option value="1.8">rápida</option></select></label>
+      </div>
+      <div class="campo">
+        <label>Origen<select id="swSrc"><option>A</option><option>B</option><option>C</option><option>D</option></select></label>
+        <label>Destino<select id="swDst"><option>B</option><option>A</option><option>C</option><option>D</option><option value="BC">broadcast</option></select></label>
+        <button class="btn" id="swSend">Enviar trama</button>
+      </div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
+      <h3>Tabla MAC</h3>
+      <table class="tablamac"><thead><tr><th>MAC</th><th>Puerto</th><th>Tipo</th></tr></thead><tbody id="swTabla"></tbody></table>
+      <div class="stepper"><button class="btn" id="swAge">Pasan 300 s sin que B hable</button><button class="btn" id="swAtaque">Ataque: MAC flooding</button></div>
+      <p class="marcador" id="swCap"></p>
+    </div>
+  </div>
+  <div class="note"><b>MAC flooding:</b> la tabla tiene un tamaño limitado. Un atacante manda miles de tramas con MAC de origen falsas hasta llenarla; entonces el switch ya no puede aprender y <b>inunda todo como un hub</b>, y el atacante captura el tráfico de los demás. Defensa: la <b>seguridad de puertos</b> (port security).</div>
+</section>
+
+<section id="reenvio">
+  <span class="eyebrow">Simulador 3 · ejercicio 10</span>
+  <h2>¿Cuándo empieza a reenviar?</h2>
+  <p class="lead">Mueve el tamaño de la trama y pulsa ▶. La línea roja marca el momento en que cada método empieza a reenviar.</p>
+  <div class="panel" style="display:grid;gap:12px">
+    <div class="rango"><label for="rvTam">Tamaño de la trama: <b id="rvTamV"></b></label><input type="range" id="rvTam" min="40" max="1518" value="800"></div>
+    <div class="campo"><label style="flex-direction:row;display:flex;gap:6px;align-items:center"><input type="checkbox" id="rvMal" checked> FCS errónea</label><button class="btn pri" id="rvPlay">▶ Llega la trama</button></div>
+    <div class="timeline" id="rvTL"></div>
+    <p id="rvRes"></p>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Método</th><th>Empieza a reenviar</th><th>¿Reenvía tramas con la FCS mal?</th><th>Latencia</th></tr></thead>
+    <tbody>
+      <tr><td><b>Almacenar y reenviar</b> (store-and-forward)</td><td>Tras recibir la trama <b>entera</b> y comprobar la FCS</td><td>No: las descarta</td><td>Mayor; depende del tamaño</td></tr>
+      <tr><td><b>Conmutación directa</b> (cut-through)</td><td>En cuanto lee la <b>MAC de destino</b> (6 primeros bytes)</td><td>Sí: no mira la FCS</td><td>Mínima y constante</td></tr>
+      <tr><td><b>Libre de fragmentos</b> (fragment-free)</td><td>Tras los primeros <b>64 bytes</b></td><td>Sí (solo filtra los fragmentos)</td><td>Intermedia</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Almacenar y reenviar es imprescindible</b> cuando los puertos de entrada y salida tienen <b>velocidades distintas</b> (por ejemplo, de 1 Gbps a 100 Mbps): la trama tiene que guardarse entera, porque sale más despacio de lo que llega. Es el método habitual de los Catalyst 2960. Los <b>fragmentos (runts)</b> de menos de 64 bytes que dejan las colisiones los filtra el libre de fragmentos; la conmutación directa no.</div>
+</section>
+
+<section id="arranque">
+  <span class="eyebrow">Simulador 4 · ordena</span>
+  <h2>Arranque y memorias</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Memoria</th><th>Qué guarda</th><th>¿Se borra al apagar?</th></tr></thead>
+    <tbody>
+      <tr><td><b>ROM</b></td><td>Programa de arranque (POST y boot loader)</td><td>No</td></tr>
+      <tr><td><b>Flash</b></td><td>Imagen de IOS (.bin) y otros archivos, como vlan.dat</td><td>No</td></tr>
+      <tr><td><b>RAM</b></td><td><b>running-config</b>, tabla MAC y otras tablas</td><td><b>Sí</b></td></tr>
+      <tr><td><b>NVRAM</b></td><td><b>startup-config</b> (según el modelo, en la flash)</td><td>No</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel" style="display:grid;gap:10px">
+    <span class="eyebrow">Ordena la secuencia de arranque</span>
+    <div class="orden-list" id="arrLista"></div>
+    <p id="arrFb"></p>
+    <div class="stepper"><button class="btn" id="arrReset">Barajar otra vez</button></div>
+  </div>
+  <div class="note"><b>Si no hay startup-config</b>, arranca con la configuración por defecto: sin contraseñas, todos los puertos activos y en la VLAN 1. Por eso un switch nuevo ya conmuta tramas sin tocar nada.</div>
+</section>
+
+<section id="led">
+  <span class="eyebrow">Simulador 5 · ¿qué significa la luz?</span>
+  <h2>LED y conexión</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>LED</th><th>Estado</th><th>Significa</th></tr></thead>
+    <tbody>
+      <tr><td>SYST</td><td>Apagado / verde / ámbar</td><td>Sin alimentación / normal / alimentado pero con fallo (por ejemplo, POST)</td></tr>
+      <tr><td>Puerto (STAT)</td><td>Apagado</td><td>Sin enlace o desactivado con shutdown</td></tr>
+      <tr><td>Puerto</td><td>Verde / verde parpadeante</td><td>Enlace / actividad</td></tr>
+      <tr><td>Puerto</td><td>Verde y ámbar alternando</td><td>Fallo de enlace</td></tr>
+      <tr><td>Puerto</td><td><b>Ámbar</b></td><td>Bloqueado por STP; al activar un puerto puede estar ámbar unos 30 s mientras STP comprueba que no hay bucles</td></tr>
+      <tr><td>Modo DUPLEX</td><td>Apagado / verde</td><td>Half / full</td></tr>
+      <tr><td>Modo SPEED</td><td>Apagado / verde / verde parpadeante</td><td>10 / 100 / 1000 Mbps</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel reto">
+    <div class="q" id="ledQ"></div>
+    <div class="opciones" id="ledOps"></div>
+    <p id="ledFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="ledOtra">Otra</button><span class="marcador" id="ledCuenta"></span></div>
+  </div>
+  <p><b>Conexión:</b> PC ↔ switch con cable directo (90 m fijos + latiguillos, fibra si la distancia lo exige). Entre switches se usan los puertos más rápidos (<b>uplinks</b>, a menudo SFP de fibra) para no crear cuellos de botella, y se pueden agrupar con EtherChannel. En redes pequeñas, estrella con un switch central; encadenar muchos en serie (<b>daisy chain</b>) suma saltos y concentra el tráfico. Los <b>enlaces redundantes</b> dan tolerancia a fallos pero crean bucles: para eso está STP.</p>
+</section>
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="dominios.html">← Anterior: Ethernet, dominios y EtherChannel</a>
+  <a href="ios.html">Siguiente: Configurar el switch (Cisco IOS) →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/conmutador.js"></script>
+</body>
+</html>

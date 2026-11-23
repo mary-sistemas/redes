@@ -108,6 +108,39 @@ window.Repaso = (function () {
     $(`#${pre}Reset`).onclick = pinta; pinta();
   }
 
+  // Animaciones SVG: mueve una "trama" por una lista de puntos. Devuelve una promesa.
+  const NS = "http://www.w3.org/2000/svg";
+  const sinMov = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let velocidad = 1;
+  function el(tag, attrs, padre) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (padre) padre.appendChild(e);
+    return e;
+  }
+  function trama(svg, pts, { color = "var(--accent)", txt = "", dur = 900 } = {}) {
+    return new Promise(res => {
+      const g = el("g", { class: "pkt" }, svg);
+      const w = Math.max(30, txt.length * 6.4 + 10);
+      el("rect", { x: -w / 2, y: -9, width: w, height: 18, rx: 4, style: `fill:${color}` }, g);
+      const t = el("text", { x: 0, y: 4, "text-anchor": "middle" }, g); t.textContent = txt;
+      const seg = []; let L = 0;
+      for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); seg.push(d); L += d; }
+      const pon = p => g.setAttribute("transform", `translate(${p[0]},${p[1]})`);
+      if (sinMov() || L === 0) { pon(pts[pts.length - 1]); setTimeout(() => { g.remove(); res(); }, 150); return; }
+      const t0 = performance.now(), D = dur / velocidad;
+      (function paso(ahora) {
+        let f = Math.min(1, (ahora - t0) / D), d = f * L, i = 0;
+        while (i < seg.length - 1 && d > seg[i]) { d -= seg[i]; i++; }
+        const a = pts[i], b = pts[i + 1], k = seg[i] ? d / seg[i] : 1;
+        pon([a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k]);
+        if (f < 1) requestAnimationFrame(paso); else { setTimeout(() => { g.remove(); res(); }, 120); }
+      })(t0);
+    });
+  }
+  const espera = ms => new Promise(r => setTimeout(r, sinMov() ? 0 : ms / velocidad));
+
   document.addEventListener("DOMContentLoaded", initTema);
-  return { store, marcas, guardaMarcas, preguntas, test, ordena };
+  return { store, marcas, guardaMarcas, preguntas, test, ordena, el, trama, espera,
+           setVelocidad: v => { velocidad = v; } };
 })();

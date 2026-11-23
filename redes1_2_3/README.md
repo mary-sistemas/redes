@@ -1,6 +1,6 @@
-# Repaso de Redes · UT1–UT3
+# Repaso de Redes · UT1–UT4
 
-Web interactiva para repasar el módulo de **Planificación y Administración de Redes** de ASIR (unidades 1 a 3). Cada tema explica el porqué con analogías, incluye simuladores paso a paso y termina con preguntas tipo examen para autoevaluarse.
+Web interactiva para repasar el módulo de **Planificación y Administración de Redes** de ASIR (unidades 1 a 4). Cada tema explica el porqué con analogías, incluye simuladores paso a paso y termina con preguntas tipo examen para autoevaluarse.
 
 **Ver la web:** https://mary-sistemas.github.io/redes/redes1_2_3/
 
@@ -18,6 +18,11 @@ Web interactiva para repasar el módulo de **Planificación y Administración de
 | UT3 | Crimpado y comprobador | ✅ Disponible |
 | UT3 | Wi-Fi | ✅ Disponible |
 | UT3 | Cableado estructurado | ✅ Disponible |
+| UT4 | Tramas y direcciones MAC | ✅ Disponible |
+| UT4 | Ethernet, dominios y EtherChannel | ✅ Disponible |
+| UT4 | El conmutador | ✅ Disponible |
+| UT4 | Configurar el switch (Cisco IOS, terminal simulado) | ✅ Disponible |
+| UT4 | STP | ✅ Disponible |
 
 ## Estructura
 
@@ -34,7 +39,8 @@ repaso-redes/
 │   ├── cables.html
 │   ├── crimpado.html
 │   ├── wifi.html
-│   └── estructurado.html
+│   ├── estructurado.html
+│   └── tramas · dominios · conmutador · ios · stp (UT4)
 ├── assets/
 │   ├── estilos.css     estilos comunes (tema claro y oscuro)
 │   ├── comun.js        botón de tema y progreso guardado
@@ -44,7 +50,9 @@ repaso-redes/
 │   ├── wireshark.js
 │   ├── normas.js
 │   ├── senal.js · cables.js · crimpado.js
-│   └── wifi.js · estructurado.js
+│   ├── wifi.js · estructurado.js
+│   ├── cli.js          terminal simulado de Cisco IOS
+│   └── tramas.js · dominios.js · conmutador.js · ios.js · stp.js
 └── README.md
 ```
 

@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Repaso de Redes UT1–UT3</title>
+<title>Repaso de Redes UT1–UT4</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Repaso interactivo de Redes (ASIR): numeración, capas y protocolos, cableado, comprobador de cables y Wi-Fi.">
+<meta name="description" content="Repaso interactivo de Redes (ASIR): numeración, capas y protocolos, cableado, Wi-Fi, switches, Cisco IOS y STP.">
 <script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,9 +20,9 @@
   </div>
 
   <header class="hero">
-    <span class="eyebrow">ASIR · Planificación y Administración de Redes · UT1–UT3</span>
+    <span class="eyebrow">ASIR · Planificación y Administración de Redes · UT1–UT4</span>
     <h1>Entender las redes, capa a capa</h1>
-    <p>Un repaso interactivo de las tres primeras unidades: sistemas de numeración, modelos de capas y protocolos, y la capa física con cableado y Wi-Fi. Cada tema explica el porqué, trae simuladores para tocar y termina con preguntas tipo examen.</p>
+    <p>Un repaso interactivo de las cuatro primeras unidades: numeración y redes locales, modelos de capas y protocolos, la capa física con cableado y Wi-Fi, y la capa de enlace con switches y STP. Cada tema explica el porqué, trae simuladores para tocar y termina con preguntas tipo examen.</p>
     <div class="como">
       <div><strong>1. Lee la idea</strong>Cada tema empieza con una analogía de la vida real.</div>
       <div><strong>2. Toca los simuladores</strong>Avanza paso a paso y mira qué cambia.</div>
@@ -103,6 +103,42 @@
         <div class="badges"><span class="badge listo">Disponible</span></div>
         <h3>Cableado estructurado</h3>
         <p>Subsistemas, regla 90 + 10, tomas y etiquetado, rack y panel de parcheo, herramientas, diseño en 3 capas, mapas y SNMP.</p>
+        <span class="progreso"></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="ut-bloque" aria-labelledby="ut4">
+    <div class="ut-cab"><span class="num">UT4</span><h2 id="ut4">La capa de enlace</h2><span class="badge seguro">Práctica: 2 cuestionarios</span></div>
+    <div class="temas-grid">
+      <a class="tarjeta" href="temas/tramas.html" data-tema="tramas" data-total="13">
+        <div class="badges"><span class="badge listo">Disponible</span></div>
+        <h3>Tramas y direcciones MAC</h3>
+        <p>Analiza cualquier MAC (OUI, I/G, U/L), unicast, multicast y broadcast, campos, relleno y una trama en binario campo a campo.</p>
+        <span class="progreso"></span>
+      </a>
+      <a class="tarjeta" href="temas/dominios.html" data-tema="dominios" data-total="12">
+        <div class="badges"><span class="badge listo">Disponible</span><span class="badge seguro">Con animaciones</span></div>
+        <h3>Ethernet, dominios y EtherChannel</h3>
+        <p>Dominios de colisión y broadcast animados sobre la red del ejercicio 5, normas 802.3 y EtherChannel en movimiento.</p>
+        <span class="progreso"></span>
+      </a>
+      <a class="tarjeta" href="temas/conmutador.html" data-tema="conmutador" data-total="12">
+        <div class="badges"><span class="badge listo">Disponible</span><span class="badge seguro">Con animaciones</span></div>
+        <h3>El conmutador</h3>
+        <p>Mira cómo aprende la tabla MAC trama a trama (ejercicio 9), inunda, filtra, MAC flooding, métodos de reenvío y arranque.</p>
+        <span class="progreso"></span>
+      </a>
+      <a class="tarjeta" href="temas/ios.html" data-tema="ios" data-total="16">
+        <div class="badges"><span class="badge listo">Disponible</span><span class="badge seguro">Terminal</span></div>
+        <h3>Configurar el switch (Cisco IOS)</h3>
+        <p>Terminal simulado de un 2960 para practicar los ejercicios 12 a 18: modos, SSH, TFTP, tabla MAC y port security.</p>
+        <span class="progreso"></span>
+      </a>
+      <a class="tarjeta" href="temas/stp.html" data-tema="stp" data-total="16">
+        <div class="badges"><span class="badge listo">Disponible</span><span class="badge seguro">Con animaciones</span></div>
+        <h3>STP</h3>
+        <p>Una tormenta de broadcast en directo, elige el puente raíz cambiando prioridades, estados con cronómetro y show spanning-tree.</p>
         <span class="progreso"></span>
       </a>
     </div>
