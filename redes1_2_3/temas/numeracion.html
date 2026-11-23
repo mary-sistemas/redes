@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sistemas de numeración · Repaso de Redes</title>
+<meta name="description" content="Binario, octal y hexadecimal: valor posicional, divisiones sucesivas, atajos por grupos de bits y ejercicios tipo examen.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT1 · Fundamentos y redes locales</span>
+  <h1>Sistemas de numeración</h1>
+  <p>Por qué los ordenadores cuentan en binario, cómo pasar de una base a otra sin memorizar tablas y por qué el hexadecimal aparece en todas las direcciones MAC. Toca los bits, divide paso a paso y practica.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#idea">La idea</a>
+  <a class="chip" href="#bases">Las 4 bases</a>
+  <a class="chip" href="#bits">Pesos</a>
+  <a class="chip" href="#adecimal">A decimal</a>
+  <a class="chip" href="#divisiones">Divisiones</a>
+  <a class="chip" href="#atajos">Atajos</a>
+  <a class="chip" href="#cuantos">¿Cuántos caben?</a>
+  <a class="chip" href="#ascii">ASCII</a>
+  <a class="chip" href="#practica">Practica</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+
+<!-- 1. idea -->
+<section id="idea">
+  <span class="eyebrow">La idea</span>
+  <h2>Contar con las cifras que tengas</h2>
+  <p>Cuando pagas 352 € no piensas en «tres, cinco, dos»: sabes que el 3 vale 300 porque está en la posición de las centenas. Eso es un <b>sistema posicional</b>: el valor de cada cifra depende de dónde está. Las demás bases funcionan exactamente igual; lo único que cambia es cuántas cifras tienes antes de «llevarte una».</p>
+  <div class="analog">
+    <div><strong>Base 10 · decimal</strong>10 cifras (0–9). Las posiciones valen 1, 10, 100, 1000… Es la que usamos porque tenemos 10 dedos.</div>
+    <div><strong>Base 2 · binario</strong>2 cifras (0 y 1). Las posiciones valen 1, 2, 4, 8, 16… Es la de las máquinas: hay corriente o no la hay.</div>
+    <div><strong>Base 16 · hexadecimal</strong>16 cifras (0–9 y A–F). Una cifra hex = 4 bits exactos, por eso se usa para escribir MAC, IPv6 y memoria sin tantos unos y ceros.</div>
+    <div><strong>Base 8 · octal</strong>8 cifras (0–7). Una cifra octal = 3 bits. Se ve en los permisos de Linux (chmod 755).</div>
+  </div>
+  <div class="note"><b>La regla de oro:</b> en base N hay N símbolos, del 0 al N−1. Por eso en binario no existe el «2» y en octal no existe el «8». Si en un ejercicio ves 1902<sub>(8</sub>, está mal escrito.</div>
+</section>
+
+<!-- 2. bases -->
+<section id="bases">
+  <span class="eyebrow">Las 4 bases</span>
+  <h2>Tabla de 0 a 15</h2>
+  <p class="lead">Esta es la «Actividad 1» de clase. Fíjate en las columnas binarias: con 3 bits llegas al 7 (la última cifra octal) y con 4 bits llegas al 15 (la F). De ahí salen los atajos.</p>
+  <div class="tbl-scroll"><table class="grid-tabla" id="tabla16">
+    <thead><tr><th>Decimal</th><th>Binario (4 bits)</th><th>Octal</th><th>Hexadecimal</th></tr></thead>
+    <tbody></tbody>
+  </table></div>
+  <div class="note">Notación: el número entre paréntesis y la base abajo. (1010)<sub>2</sub> = 10<sub>10</sub> = 12<sub>8</sub> = A<sub>16</sub>. En los ejercicios de clase verás también 1010<sub>(2</sub>.</div>
+</section>
+
+<!-- 3. bits -->
+<section id="bits">
+  <span class="eyebrow">Simulador 1</span>
+  <h2>El peso de cada bit</h2>
+  <p class="lead">Pulsa los bits para encenderlos. Cada posición vale el doble que la de su derecha. El número decimal es la suma de los pesos de los bits encendidos.</p>
+  <div class="panel" style="display:grid;gap:14px">
+    <div class="bitrow" id="bitrow" role="group" aria-label="8 bits"></div>
+    <p class="suma" id="bitSuma"></p>
+    <div class="resul">
+      <div><span>Decimal</span><b id="bDec"></b></div>
+      <div><span>Hexadecimal</span><b id="bHex"></b></div>
+      <div><span>Octal</span><b id="bOct"></b></div>
+    </div>
+    <div class="stepper">
+      <button class="btn" id="bitTodos">Todos a 1</button>
+      <button class="btn" id="bitNinguno">Todos a 0</button>
+      <button class="btn" id="bitMas">+1</button>
+    </div>
+  </div>
+  <div class="note"><b>Fíjate:</b> 8 bits a 1 = 255. Ese es el número más alto de cada octeto de una IP (255.255.255.0). Y si pulsas +1 sobre 0111 1111 (127) se encienden todos de golpe: 1000 0000 (128). Es como pasar de 99 a 100.</div>
+</section>
+
+<!-- 4. a decimal -->
+<section id="adecimal">
+  <span class="eyebrow">Simulador 2 · de cualquier base a decimal</span>
+  <h2>Multiplicar cada cifra por su peso</h2>
+  <p class="lead">Es el Teorema Fundamental de la Numeración (TFN): N<sub>10</sub> = Σ cifra × base<sup>posición</sup>, contando las posiciones desde la derecha y empezando en 0.</p>
+  <div class="panel" style="display:grid;gap:14px">
+    <div class="campo">
+      <label>Número<input id="tfnNum" value="5F3C" autocomplete="off" spellcheck="false"></label>
+      <label>Base<select id="tfnBase"><option value="2">2</option><option value="8">8</option><option value="16" selected>16</option></select></label>
+    </div>
+    <div class="tbl-scroll"><table class="divs" id="tfnTabla"></table></div>
+    <p id="tfnRes" class="suma"></p>
+  </div>
+  <div class="note warn"><b>Error típico:</b> empezar las posiciones por la izquierda o empezar en 1. La cifra de la derecha del todo siempre se multiplica por base<sup>0</sup> = 1. Y en hexadecimal, antes de multiplicar, cambia la letra por su valor (F = 15, C = 12).</div>
+</section>
+
+<!-- 5. divisiones -->
+<section id="divisiones">
+  <span class="eyebrow">Simulador 3 · de decimal a cualquier base</span>
+  <h2>Divisiones sucesivas</h2>
+  <p class="lead">Divide entre la base a la que quieres llegar, quédate con el resto y vuelve a dividir el cociente. Cuando el cociente sea 0, lee los restos <b>de abajo arriba</b>.</p>
+  <div class="panel" style="display:grid;gap:14px">
+    <div class="campo">
+      <label>Decimal<input id="divNum" value="25" inputmode="numeric" autocomplete="off"></label>
+      <label>A base<select id="divBase"><option value="2" selected>2</option><option value="8">8</option><option value="16">16</option></select></label>
+      <button class="btn pri" id="divNext">Siguiente división</button>
+      <button class="btn" id="divTodo">Hacerlas todas</button>
+    </div>
+    <div class="tbl-scroll"><table class="divs" id="divTabla"></table></div>
+    <p id="divRes"></p>
+  </div>
+  <div class="note"><b>¿Por qué de abajo arriba?</b> El primer resto que sacas es lo que «sobra» al hacer grupos de 2: son las unidades, la cifra de la derecha. Cada división siguiente cuenta grupos más grandes, así que sus restos van más a la izquierda.</div>
+</section>
+
+<!-- 6. atajos -->
+<section id="atajos">
+  <span class="eyebrow">Simulador 4 · el método corto</span>
+  <h2>Binario ↔ octal y hexadecimal sin pasar por decimal</h2>
+  <p class="lead">Como 8 = 2<sup>3</sup> y 16 = 2<sup>4</sup>, cada cifra octal son exactamente 3 bits y cada cifra hex son exactamente 4. Agrupa <b>desde la derecha</b> y rellena con ceros a la izquierda si falta.</p>
+  <div class="panel" style="display:grid;gap:14px">
+    <div class="campo">
+      <label>Binario<input id="grpNum" value="110111010" style="width:20ch" autocomplete="off" spellcheck="false"></label>
+      <div class="filtros" role="group" aria-label="Agrupar de">
+        <button class="chip on" data-g="4">Grupos de 4 → hex</button>
+        <button class="chip" data-g="3">Grupos de 3 → octal</button>
+      </div>
+    </div>
+    <div class="grupos" id="grupos"></div>
+    <p id="grpRes"></p>
+  </div>
+  <div class="note">Al revés es igual de fácil: cada cifra hex se escribe con 4 bits y cada cifra octal con 3. Por ejemplo 247<sub>8</sub> = 010 100 111<sub>2</sub>. Y para ir de <b>hex a octal</b> (ejercicio 6 de clase), pasa por binario: hex → grupos de 4 → júntalo todo → reagrupa de 3 en 3 desde la derecha.</div>
+</section>
+
+<!-- 7. cuántos -->
+<section id="cuantos">
+  <span class="eyebrow">Con n bits</span>
+  <h2>¿Cuántos números caben?</h2>
+  <p class="lead">Cada bit que añades duplica las combinaciones. Con <b>n</b> bits hay <b>2<sup>n</sup></b> números distintos, y el más grande es <b>2<sup>n</sup> − 1</b> porque se empieza a contar en 0.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Bits</th><th>Números distintos (2ⁿ)</th><th>Máximo (2ⁿ − 1)</th><th>Dónde lo verás</th></tr></thead>
+    <tbody>
+      <tr><td class="n">8</td><td class="n">256</td><td class="n">255</td><td>Un octeto de una IPv4</td></tr>
+      <tr><td class="n">10</td><td class="n">1 024</td><td class="n">1 023</td><td>Por eso 1 KiB = 1024 bytes</td></tr>
+      <tr><td class="n">16</td><td class="n">65 536</td><td class="n">65 535</td><td>Números de puerto (0–65535)</td></tr>
+      <tr><td class="n">32</td><td class="n">4 294 967 296</td><td class="n">4 294 967 295</td><td>Direcciones IPv4 en total</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Comparar binarios sin convertir</b> (ejercicio 4): si tienen los mismos bits, mira de izquierda a derecha y busca el primer bit en el que se diferencian. El que tiene 1 ahí es el mayor, porque ese bit pesa más que todos los de su derecha juntos. 0100<b>1</b>000 &gt; 0100<b>0</b>100.</div>
+</section>
+
+<!-- 8. ascii -->
+<section id="ascii">
+  <span class="eyebrow">Simulador 5 · texto a bits</span>
+  <h2>Tu nombre en ASCII</h2>
+  <p class="lead">ASCII asigna un número a cada carácter: la «A» es el 65, la «a» el 97. Cada letra ocupa un byte (8 bits). Escribe algo y míralo en todas las bases (es el ejercicio 9 de clase).</p>
+  <div class="panel" style="display:grid;gap:14px">
+    <div class="campo"><label>Texto<input id="asciiTxt" value="Mary" maxlength="12" style="width:16ch" autocomplete="off"></label></div>
+    <div class="tbl-scroll"><table class="grid-tabla" id="asciiTabla"></table></div>
+  </div>
+  <div class="note">Mayúsculas y minúsculas se diferencian en un solo bit: A = 01<b>0</b>0 0001 (65) y a = 01<b>1</b>0 0001 (97). La distancia entre ellas es siempre 32.</div>
+</section>
+
+<!-- 9. practica -->
+<section id="practica">
+  <span class="eyebrow">Practica</span>
+  <h2>Conversiones sin fin</h2>
+  <p class="lead">Hazlo en papel y escribe el resultado. Si fallas, el ejercicio te enseña el método.</p>
+  <div class="panel reto">
+    <div class="filtros" role="group" aria-label="Tipo de ejercicio">
+      <button class="chip on" data-t="todo">Todo</button>
+      <button class="chip" data-t="adec">A decimal</button>
+      <button class="chip" data-t="desdec">Desde decimal</button>
+      <button class="chip" data-t="corto">Método corto</button>
+    </div>
+    <div class="q" id="retoQ"></div>
+    <div class="campo"><label>Tu resultado<input id="retoR" autocomplete="off" spellcheck="false" style="width:18ch"></label>
+      <button class="btn pri" id="retoOk">Comprobar</button><button class="btn" id="retoOtro">Otro</button></div>
+    <p id="retoFb" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- 10. comprueba -->
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="../index.html">← Volver a todos los temas</a>
+  <a href="redes-locales.html">Siguiente: Redes locales y medios →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/numeracion.js"></script>
+</body>
+</html>

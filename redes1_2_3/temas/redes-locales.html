@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Redes locales y medios · Repaso de Redes</title>
+<meta name="description" content="Qué es una LAN, componentes, tipos de redes, topologías físicas y lógicas, Ethernet, medios guiados y no guiados.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT1 · Fundamentos y redes locales</span>
+  <h1>Redes locales y medios</h1>
+  <p>Qué es una red local y de qué está hecha, cómo se clasifican las redes, qué pasa cuando se rompe un cable en cada topología y qué medio elegir según la distancia, la velocidad y el entorno.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#idea">La idea</a>
+  <a class="chip" href="#lan">¿Qué es una LAN?</a>
+  <a class="chip" href="#componentes">Componentes</a>
+  <a class="chip" href="#tipos">Tipos de redes</a>
+  <a class="chip" href="#topologias">Topologías</a>
+  <a class="chip" href="#ethernet">Ethernet</a>
+  <a class="chip" href="#guiados">Medios guiados</a>
+  <a class="chip" href="#noguiados">No guiados</a>
+  <a class="chip" href="#elegir">¿Qué medio?</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+
+<!-- 1. idea -->
+<section id="idea">
+  <span class="eyebrow">La idea</span>
+  <h2>Una red es como el sistema de carreteras</h2>
+  <p>Para que dos personas se manden algo hacen falta las mismas piezas que en cualquier red: alguien que envía, alguien que recibe, un camino, el «paquete» en sí y unas normas que todos respetan. Si alguna falla, no hay comunicación.</p>
+  <div class="analog">
+    <div><strong>Emisor</strong>Origen del mensaje. Tu PC cuando pides una web.</div>
+    <div><strong>Receptor</strong>Destino del mensaje. El servidor que te responde.</div>
+    <div><strong>Canal</strong>El medio por el que viaja: cable, fibra o aire.</div>
+    <div><strong>Señal</strong>La forma física del mensaje: electricidad, luz u ondas.</div>
+    <div><strong>Protocolo</strong>Las reglas comunes. Sin ellas es como hablar idiomas distintos.</div>
+  </div>
+</section>
+
+<!-- 2. LAN -->
+<section id="lan">
+  <span class="eyebrow">Definición</span>
+  <h2>¿Qué es una red de área local?</h2>
+  <p>Una <b>LAN</b> (Local Area Network) conecta ordenadores que están <b>físicamente cerca</b>, normalmente en el mismo edificio. Incluye hardware (cables, tarjetas, switches) y software (protocolos, sistemas operativos de red). Si la conexión es sin cables, por ondas, se llama <b>WLAN</b> (Wireless LAN).</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th></th><th>Cliente-servidor</th><th>P2P (entre iguales)</th></tr></thead>
+    <tbody>
+      <tr><th>Cómo funciona</th><td>Un ordenador central (servidor) ofrece recursos y servicios a los demás (clientes)</td><td>Cualquier equipo puede ser cliente y servidor a la vez</td></tr>
+      <tr><th>Ventaja</th><td>Administración y seguridad centralizadas</td><td>Barata y sencilla, sin equipo dedicado</td></tr>
+      <tr><th>Inconveniente</th><td>Si cae el servidor, cae el servicio</td><td>Difícil de controlar cuando crece</td></tr>
+      <tr><th>Ejemplo</th><td>HTTP: tu navegador pide, el servidor web responde</td><td>BitTorrent, compartir una carpeta entre dos PC</td></tr>
+    </tbody>
+  </table></div>
+  <div class="capas-tela">
+    <div style="--c:var(--l4)"><strong>Recursos compartidos</strong>Una impresora o un escáner para todos los equipos.</div>
+    <div style="--c:var(--l3)"><strong>Ficheros y software compartidos</strong>Varias personas trabajan sobre el mismo documento o usan una aplicación instalada en otro equipo.</div>
+    <div style="--c:var(--l2)"><strong>Administración centralizada y remota</strong>El administrador instala, controla o arregla equipos sin moverse de su sitio.</div>
+    <div style="--c:var(--l7)"><strong>Escalabilidad</strong>Se pueden añadir equipos o mejorar la red sin molestar a los que ya están.</div>
+  </div>
+</section>
+
+<!-- 3. componentes -->
+<section id="componentes">
+  <span class="eyebrow">Componentes</span>
+  <h2>De qué está hecha una red local</h2>
+  <p class="lead"><b>Equipos terminales de datos (ETD)</b> o <b>hosts</b>: ordenadores, impresoras, móviles… Son los que inician o terminan una comunicación y funcionan aunque no estén en red. Para conectarse necesitan una <b>tarjeta de red (NIC)</b>, y además <b>conectores</b> si es cableada o una <b>antena</b> si es inalámbrica.</p>
+  <p class="lead"><b>Dispositivos de red (intermedios)</b>: conectan a los hosts entre sí. Cada uno está especializado en una función, y lo que lo define es <b>hasta qué capa «mira»</b>:</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Aparato</th><th>Nivel</th><th>Qué hace</th></tr></thead>
+    <tbody>
+      <tr><td>Repetidor</td><td><span class="tag" style="border-color:var(--l1)">Físico</span></td><td>Regenera y amplifica la señal para llegar más lejos</td></tr>
+      <tr><td>Concentrador (hub)</td><td><span class="tag" style="border-color:var(--l1)">Físico</span></td><td>Varios puertos; repite lo que le llega por todos, sin filtrar (difusión)</td></tr>
+      <tr><td>Puente (bridge)</td><td><span class="tag" style="border-color:var(--l2)">Enlace</span></td><td>Une dos segmentos de red y filtra por MAC</td></tr>
+      <tr><td>Conmutador (switch)</td><td><span class="tag" style="border-color:var(--l2)">Enlace</span></td><td>Envía cada trama solo al puerto del destino según la MAC (conmutación). Reduce colisiones</td></tr>
+      <tr><td>Enrutador (router)</td><td><span class="tag" style="border-color:var(--l3)">Red</span></td><td>Encamina paquetes entre redes distintas usando la IP. Separa dominios de difusión (broadcast)</td></tr>
+      <tr><td>Cortafuegos (firewall)</td><td><span class="tag">Varias</span></td><td>Permite o bloquea tráfico según reglas</td></tr>
+      <tr><td>Módem / cablemódem</td><td><span class="tag" style="border-color:var(--l1)">Físico</span></td><td>Adapta la señal a la línea de teléfono (módem) o al coaxial de la TV (cablemódem)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Servicio y protocolo no son lo mismo.</b> Un <b>servicio</b> es lo que ofrece un equipo a los demás (DHCP, DNS, web con Apache, FTP, impresión). El <b>protocolo</b> es el conjunto de normas que hay que cumplir para dar ese servicio. Ejemplo: el servicio web usa el protocolo HTTP.</div>
+  <div class="note"><b>Físico y lógico:</b> un router (elemento físico) usa el protocolo IP (elemento lógico) para enrutar paquetes. Físicos: cables, tarjetas, routers, switches. Lógicos: protocolos, servicios, tramas y paquetes.</div>
+</section>
+
+<!-- 4. tipos -->
+<section id="tipos">
+  <span class="eyebrow">Clasificaciones</span>
+  <h2>Tipos de redes</h2>
+  <p class="lead">Hay tantas clasificaciones como criterios. Las de clase:</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Según…</th><th>Tipos</th></tr></thead>
+    <tbody>
+      <tr><th>Su extensión</th><td><b>PAN</b> (personal, unos metros) · <b>HAN</b> (doméstica) · <b>LAN</b> (local, un edificio) · <b>CAN</b> (campus, varios edificios de un recinto) · <b>MAN</b> (metropolitana, una ciudad) · <b>WAN</b> (extensa, países o el mundo: Internet)</td></tr>
+      <tr><th>El tipo de acceso</th><td>Red <b>pública</b> o <b>privada</b> (según su dirección IP)</td></tr>
+      <tr><th>El medio</th><td>Red <b>cableada</b> o <b>inalámbrica</b></td></tr>
+      <tr><th>Su topología</th><td>Bus, anillo, estrella, malla (estrella extendida y jerárquica son varias estrellas unidas)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel reto">
+    <span class="eyebrow">Simulador 1 · clasifica por extensión</span>
+    <div class="q" id="tipoQ"></div>
+    <div class="opciones" id="tipoOps"></div>
+    <p id="tipoFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="tipoOtra">Otra</button><span class="marcador" id="tipoCuenta"></span></div>
+  </div>
+</section>
+
+<!-- 5. topologías -->
+<section id="topologias">
+  <span class="eyebrow">Simulador 2 · rómpelo tú</span>
+  <h2>Topologías: qué pasa cuando algo falla</h2>
+  <p class="lead">Elige una topología y <b>pulsa un cable</b> para cortarlo o <b>un equipo</b> para apagarlo. Mira cuántos equipos siguen comunicándose. Es la mejor forma de entender sus ventajas e inconvenientes.</p>
+  <div class="filtros" role="group" aria-label="Topología">
+    <button class="chip on" data-topo="estrella">Estrella</button>
+    <button class="chip" data-topo="bus">Bus</button>
+    <button class="chip" data-topo="anillo">Anillo</button>
+    <button class="chip" data-topo="malla">Malla</button>
+  </div>
+  <div class="topo-wrap">
+    <div class="panel topo"><svg id="topoSvg" viewBox="0 0 320 260" role="img" aria-label="Esquema de la topología"></svg></div>
+    <div class="panel det">
+      <h3 id="topoNom"></h3>
+      <p id="topoDesc"></p>
+      <p class="estado" id="topoEstado" aria-live="polite"></p>
+      <div class="stepper"><button class="btn" id="topoReset">Arreglarlo todo</button></div>
+    </div>
+  </div>
+  <div class="note"><b>Topología física ≠ topología lógica.</b> La <b>física</b> es cómo están colocados los cables. La <b>lógica</b> es cómo se turnan los equipos para hablar. Una red en <b>estrella física con un hub</b> funciona como un <b>bus lógico</b>: el hub repite todo a todos, igual que si compartieran un solo cable.</div>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:8px">
+      <h3>Bus lógico</h3>
+      <p>Sin turnos ni orden. Quien quiere hablar escucha el medio y, si está libre, transmite. Todos reciben todo y cada equipo decide si es para él. <b>Puede haber colisiones</b> si dos transmiten a la vez.</p>
+    </div>
+    <div class="panel" style="display:grid;gap:8px">
+      <h3>Anillo lógico (paso de testigo)</h3>
+      <p>Un <b>testigo (token)</b> va pasando de equipo en equipo; solo transmite quien lo tiene. Si no quiere hablar, lo pasa al siguiente. Como solo hay un testigo, <b>no hay colisiones</b>. Ejemplo: Token Ring.</p>
+    </div>
+  </div>
+  <div class="note"><b>Difusión y conmutación:</b> en <b>difusión</b> (broadcast) el mensaje llega a todos los nodos, como hace un hub. En <b>conmutación</b> (switching) se dirige solo al destinatario, como hace un switch.</div>
+</section>
+
+<!-- 6. ethernet -->
+<section id="ethernet">
+  <span class="eyebrow">Ethernet · IEEE 802.3</span>
+  <h2>La tecnología LAN que lo usa todo el mundo</h2>
+  <p>Ethernet la crearon Xerox, Intel y DEC en los años 70 y se estandarizó como <b>IEEE 802.3</b> en 1983. Define cómo se mandan los datos en <b>tramas</b> por cable, de 10 Mbps a más de 100 Gbps.</p>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:8px">
+      <h3>Half-duplex</h3>
+      <p>Como un walkie-talkie: <b>en los dos sentidos, pero no a la vez</b>. Hay que turnarse, así que puede haber colisiones; se gestionan con <b>CSMA/CD</b> (escuchar antes de hablar y, si chocan, esperar un tiempo al azar). Típico de los hubs.</p>
+    </div>
+    <div class="panel" style="display:grid;gap:8px">
+      <h3>Full-duplex</h3>
+      <p>Como una llamada de teléfono: <b>los dos sentidos a la vez</b>. No hay colisiones y el ancho de banda efectivo se duplica. Es lo normal con switches.</p>
+    </div>
+  </div>
+  <div class="note"><b>Autonegociación:</b> al enchufar el cable, los dos extremos se mandan pulsos <b>FLP</b> (Fast Link Pulse) para ponerse de acuerdo en la <b>velocidad</b> (10, 100 o 1000 Mbps) y el <b>modo dúplex</b>. Eligen lo mejor que soporten los dos.</div>
+</section>
+
+<!-- 7. guiados -->
+<section id="guiados">
+  <span class="eyebrow">Medios guiados</span>
+  <h2>Cobre y fibra</h2>
+  <p class="lead">Un medio <b>guiado</b> lleva la señal por un camino físico: un cable. El <b>par trenzado</b> es el más usado en las LAN. Los pares se trenzan para que las interferencias se anulen entre sí; el apantallamiento añade protección extra.</p>
+  <div class="capas-tela">
+    <div style="--c:var(--l4)"><strong>UTP</strong>Unshielded Twisted Pair. Sin apantallar. El más común en interiores.</div>
+    <div style="--c:var(--l5)"><strong>FTP · F/UTP</strong>Una lámina de aluminio que envuelve a todos los pares.</div>
+    <div style="--c:var(--l7)"><strong>STP · S/FTP</strong>Malla metálica global y además lámina en cada par. Para entornos con muchas interferencias.</div>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Categoría</th><th>Frecuencia</th><th>Velocidad y distancia</th></tr></thead>
+    <tbody>
+      <tr><td class="n">Cat 5e</td><td class="n">100 MHz</td><td>1 Gbps a 100 m</td></tr>
+      <tr><td class="n">Cat 6</td><td class="n">250 MHz</td><td>1 Gbps a 100 m · 10 Gbps solo hasta 37–55 m</td></tr>
+      <tr><td class="n">Cat 6A</td><td class="n">500 MHz</td><td>10 Gbps a 100 m</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>Para el examen:</b> si piden 10 Gbps a 100 m, la respuesta es <b>Cat 6A</b>, no Cat 6. La Cat 6 aguanta 10 Gbps pero solo en distancias cortas.</div>
+
+  <h3>Cable coaxial (de dentro a fuera)</h3>
+  <div class="capas-tela">
+    <div style="--c:var(--l6)"><strong>1. Núcleo</strong>Hilo de cobre que lleva la señal.</div>
+    <div style="--c:var(--l5)"><strong>2. Dieléctrico</strong>Aislante de plástico que separa el núcleo de la malla y evita cortocircuitos.</div>
+    <div style="--c:var(--l3)"><strong>3. Malla o blindaje</strong>Metal trenzado o lámina. Es el retorno de la señal (masa) y protege del ruido.</div>
+    <div style="--c:var(--l1)"><strong>4. Cubierta</strong>PVC o teflón. Protege de la humedad, rozaduras y cortes.</div>
+  </div>
+  <p>Impedancia de <b>75 Ω</b>. Hoy se usa en TV, CCTV y redes HFC (el «cable» de las operadoras).</p>
+
+  <h3>Fibra óptica: la señal es luz</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th></th><th>Monomodo (SMF)</th><th>Multimodo (MMF)</th></tr></thead>
+    <tbody>
+      <tr><th>Núcleo</th><td>≈ 9 µm, muy fino: un solo camino de luz</td><td>50 o 62,5 µm: varios caminos (modos) de luz</td></tr>
+      <tr><th>Emisor</th><td>Láser</td><td>Fuentes de luz más baratas</td></tr>
+      <tr><th>Alcance</th><td>10 a 40 km</td><td>300 a 550 m</td></tr>
+      <tr><th>Uso</th><td>Enlaces WAN y MAN, entre edificios lejanos</td><td>Cableado interno y centros de datos</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>¿Por qué llega más lejos la monomodo?</b> En la multimodo cada rayo de luz rebota por un camino distinto y llegan en momentos ligeramente distintos; la señal se «emborrona» con la distancia. En la monomodo solo hay un camino, así que eso no pasa.</div>
+  <p><b>Conectores de fibra:</b> <b>LC</b> (pequeño, el estándar en switches), <b>SC</b> (cuadrado, típico en los hogares) y <b>ST</b> (de bayoneta, antiguo).</p>
+  <p><b>DAC (Direct Attach Copper):</b> cable de cobre con los conectores ya montados para unir equipos <b>en el mismo rack o en racks contiguos</b>. Barato, latencia mínima y de 10 a 800 Gbps, pero solo para distancias muy cortas.</p>
+</section>
+
+<!-- 8. no guiados -->
+<section id="noguiados">
+  <span class="eyebrow">Medios no guiados</span>
+  <h2>Por el aire</h2>
+  <p class="lead">Un medio <b>no guiado</b> manda la señal en forma de ondas, sin cable que la conduzca.</p>
+  <h3>Wi-Fi: las bandas</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Banda</th><th>Alcance</th><th>Velocidad e interferencias</th></tr></thead>
+    <tbody>
+      <tr><td class="n">2,4 GHz</td><td>El mayor: atraviesa mejor las paredes</td><td>Menos velocidad y más interferencias (vecinos, microondas, Bluetooth)</td></tr>
+      <tr><td class="n">5 GHz</td><td>Medio</td><td>Más ancho de banda y menos interferencias</td></tr>
+      <tr><td class="n">6 GHz</td><td>El menor</td><td>Muy rápida, latencia casi nula, sin interferencias de vecinos ni de equipos antiguos</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Regla:</b> a más frecuencia, más velocidad pero menos alcance. Las ondas de frecuencia alta se «cansan» antes al atravesar obstáculos.</div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Norma</th><th>Nombre</th><th>Año</th><th>Velocidad máxima (según los apuntes)</th></tr></thead>
+    <tbody>
+      <tr><td class="n">802.11ac</td><td>Wi-Fi 5</td><td>2013</td><td>Hasta 1,3 Gbps</td></tr>
+      <tr><td class="n">802.11ax</td><td>Wi-Fi 6</td><td>2019</td><td>Hasta 9,6 Gbps; más eficiente en redes con muchos equipos</td></tr>
+      <tr><td class="n">802.11be</td><td>Wi-Fi 7</td><td>2024</td><td>Hasta 46 Gbps y muy baja latencia</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Bluetooth frente a Zigbee</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th></th><th>Bluetooth</th><th>Zigbee</th></tr></thead>
+    <tbody>
+      <tr><th>Alcance</th><td>1 a 10 m</td><td>Hasta 100 m</td></tr>
+      <tr><th>Velocidad</th><td>Hasta 3 Mbps (más rápido)</td><td>Hasta 250 kbps</td></tr>
+      <tr><th>Consumo</th><td>Bajo</td><td>Muy bajo: aparatos con pilas que duran años</td></tr>
+      <tr><th>Uso típico</th><td>Auriculares, ratón, reloj (redes personales)</td><td>Sensores y domótica (IoT)</td></tr>
+    </tbody>
+  </table></div>
+  <h3>4G frente a 5G</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th></th><th>4G</th><th>5G</th></tr></thead>
+    <tbody>
+      <tr><th>Pensado para</th><td>Conectar móviles a Internet</td><td>Conectarlo todo (IoT)</td></tr>
+      <tr><th>Velocidad</th><td>Hasta 1 Gbps</td><td>Hasta 20 Gbps</td></tr>
+      <tr><th>Latencia</th><td>Mayor</td><td>1 ms</td></tr>
+      <tr><th>Capacidad</th><td>Menor</td><td>Hasta un millón de dispositivos por km²</td></tr>
+      <tr><th>Novedad</th><td>—</td><td><b>Network slicing</b>: «trocea» la red en líneas virtuales reservadas para servicios críticos (ambulancias, fábricas)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="capas-tela">
+    <div style="--c:var(--l3)"><strong>Microondas terrestres</strong>Ondas de radio de alta frecuencia entre dos antenas. Necesitan <b>línea de visión directa</b>. Unen sedes lejanas o torres de telefonía donde tirar fibra no compensa.</div>
+    <div style="--c:var(--l7)"><strong>Infrarrojos (IrDA)</strong>Muy corto alcance y también necesitan línea de visión. Mandos a distancia y algunos usos industriales.</div>
+  </div>
+</section>
+
+<!-- 9. elegir -->
+<section id="elegir">
+  <span class="eyebrow">Simulador 3 · eres la técnica</span>
+  <h2>¿Qué medio pondrías?</h2>
+  <p class="lead">No hay un medio mejor que otro: depende del <b>alcance</b>, la <b>velocidad</b>, el <b>coste</b> y el <b>entorno</b>. Lee el caso y elige.</p>
+  <div class="panel reto">
+    <div class="q" id="medQ"></div>
+    <div class="opciones" id="medOps"></div>
+    <p id="medFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="medOtra">Otro caso</button><span class="marcador" id="medCuenta"></span></div>
+  </div>
+</section>
+
+<!-- 10. comprueba -->
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="numeracion.html">← Anterior: Sistemas de numeración</a>
+  <a href="capas.html">Siguiente: Capas y protocolos (UT2) →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/redes-locales.js"></script>
+</body>
+</html>

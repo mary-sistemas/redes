@@ -8,8 +8,8 @@ Web interactiva para repasar el módulo de **Planificación y Administración de
 
 | Unidad | Tema | Estado |
 |---|---|---|
-| UT1 | Sistemas de numeración | Próximamente |
-| UT1 | Redes locales y medios | Próximamente |
+| UT1 | Sistemas de numeración | ✅ Disponible |
+| UT1 | Redes locales y medios | ✅ Disponible |
 | UT2 | Capas y protocolos | ✅ Disponible |
 | UT2 | Wireshark y tramas | Próximamente |
 | UT2 | Normalización e IEEE 802 | Próximamente |
@@ -25,11 +25,15 @@ Web interactiva para repasar el módulo de **Planificación y Administración de
 repaso-redes/
 ├── index.html          portada con todos los temas
 ├── temas/
-│   └── capas.html      una página por tema
+│   ├── numeracion.html     una página por tema
+│   ├── redes-locales.html
+│   └── capas.html
 ├── assets/
 │   ├── estilos.css     estilos comunes (tema claro y oscuro)
 │   ├── comun.js        botón de tema y progreso guardado
-│   └── capas.js        simuladores y preguntas del tema Capas
+│   ├── numeracion.js   simuladores y preguntas de cada tema
+│   ├── redes-locales.js
+│   └── capas.js
 └── README.md
 ```
 
