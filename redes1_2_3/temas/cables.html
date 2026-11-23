@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cables y categorías · Repaso de Redes</title>
+<meta name="description" content="Par trenzado, apantallamientos, categorías Cat 3 a Cat 8, estándares 802.3, la regla 90 + 10, PoE, fibra óptica y coaxial en profundidad.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT3 · La capa física</span>
+  <h1>Cables y categorías</h1>
+  <p>Lo que viste en la UT1, ahora con el porqué: por qué se trenzan los hilos, qué categoría hace falta para cada velocidad, de dónde salen los 100 metros y cuándo compensa la fibra.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#trenzado">Par trenzado</a>
+  <a class="chip" href="#categorias">Categorías</a>
+  <a class="chip" href="#ethernet">Estándares 802.3</a>
+  <a class="chip" href="#tramos">¿Cumple?</a>
+  <a class="chip" href="#poe">PoE y conectores</a>
+  <a class="chip" href="#fibra">Fibra</a>
+  <a class="chip" href="#coaxial">Coaxial</a>
+  <a class="chip" href="#compara">Comparativa</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+<!-- 1. trenzado -->
+<section id="trenzado">
+  <span class="eyebrow">El medio de las LAN</span>
+  <h2>¿Por qué se trenzan los hilos?</h2>
+  <p>Un cable de red tiene <b>4 pares</b> (8 hilos). En cada par, un hilo lleva la señal y el otro <b>la misma señal invertida</b> (transmisión diferencial). Si llega una interferencia, afecta casi igual a los dos hilos; el receptor resta uno del otro y <b>el ruido se anula</b>. Trenzarlos hace que los dos hilos estén expuestos por igual al ruido y además reduce la diafonía con los pares vecinos. Por eso <b>cada par tiene un paso de trenzado distinto</b>.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Apantallado: ventajas</th><th>Apantallado: inconvenientes</th></tr></thead>
+    <tbody>
+      <tr><td>Más inmunidad a EMI y menos diafonía</td><td>Más caro, más grueso y más rígido</td></tr>
+      <tr><td>Necesario en las categorías altas (Cat 7, Cat 8)</td><td>Necesita conectores apantallados y <b>puesta a tierra continua</b>: mal conectado a tierra puede funcionar peor que un UTP</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note">Recuerda los nombres de la UT1: <b>UTP</b> sin apantallar, <b>F/UTP</b> lámina global, <b>S/FTP</b> malla global + lámina por par. La letra antes de la barra es el apantallado global y la de después, el de cada par (U = sin, F = lámina, S = malla).</div>
+</section>
+
+<!-- 2. categorías -->
+<section id="categorias">
+  <span class="eyebrow">ANSI/TIA-568</span>
+  <h2>Categorías</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Cat</th><th>Frecuencia</th><th>Velocidad típica</th><th>Notas</th></tr></thead>
+    <tbody>
+      <tr><td class="n">3</td><td class="n">16 MHz</td><td>10 Mbps</td><td>Obsoleta, telefonía</td></tr>
+      <tr><td class="n">5</td><td class="n">100 MHz</td><td>100 Mbps</td><td>Obsoleta</td></tr>
+      <tr><td class="n">5e</td><td class="n">100 MHz</td><td>1 Gbps a 100 m</td><td>El mínimo aceptable hoy</td></tr>
+      <tr><td class="n">6</td><td class="n">250 MHz</td><td>1 Gbps a 100 m · 10 Gbps a 37–55 m</td><td>Suele llevar separador en cruz</td></tr>
+      <tr><td class="n">6A</td><td class="n">500 MHz</td><td>10 Gbps a 100 m</td><td><b>Recomendada para instalaciones nuevas</b></td></tr>
+      <tr><td class="n">7</td><td class="n">600 MHz</td><td>10 Gbps</td><td>Siempre apantallada (S/FTP); RJ-45 o GG45</td></tr>
+      <tr><td class="n">7A</td><td class="n">1000 MHz</td><td>10 Gbps</td><td>Poco extendida</td></tr>
+      <tr><td class="n">8</td><td class="n">2000 MHz</td><td>25/40 Gbps hasta 30 m</td><td>Centros de datos: switch ↔ servidor en la misma fila</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>La categoría la marca todo el canal</b>: cable + conectores + paneles + latiguillos. Un solo componente Cat 5e en un enlace Cat 6A lo deja en Cat 5e. Es como una cadena: vale lo que el eslabón más débil.</div>
+  <div class="note"><b>Por qué más MHz = más velocidad:</b> las señales rápidas usan frecuencias altas, y las frecuencias altas se atenúan más y provocan más diafonía. Una categoría alta está fabricada para aguantar más MHz con calidad.</div>
+</section>
+
+<!-- 3. ethernet -->
+<section id="ethernet">
+  <span class="eyebrow">IEEE 802.3 sobre par trenzado</span>
+  <h2>Estándares: velocidad + BASE + medio</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Estándar</th><th>Velocidad</th><th>Categoría mínima</th><th>Pares</th><th>Distancia</th></tr></thead>
+    <tbody>
+      <tr><td class="n">10BASE-T</td><td>10 Mbps</td><td>Cat 3</td><td>2 (pines 1-2 y 3-6)</td><td>100 m</td></tr>
+      <tr><td class="n">100BASE-TX</td><td>100 Mbps</td><td>Cat 5</td><td>2 (pines 1-2 y 3-6)</td><td>100 m</td></tr>
+      <tr><td class="n">1000BASE-T</td><td>1 Gbps</td><td>Cat 5e</td><td>4</td><td>100 m</td></tr>
+      <tr><td class="n">2.5GBASE-T / 5GBASE-T</td><td>2,5 / 5 Gbps</td><td>Cat 5e / Cat 6</td><td>4</td><td>100 m</td></tr>
+      <tr><td class="n">10GBASE-T</td><td>10 Gbps</td><td>Cat 6A (Cat 6 hasta ~55 m)</td><td>4</td><td>100 m</td></tr>
+      <tr><td class="n">25G / 40GBASE-T</td><td>25 / 40 Gbps</td><td>Cat 8</td><td>4</td><td>30 m</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>La regla 90 + 10:</b> los 100 m son de <b>canal completo</b>. Se reparten en <b>90 m de cable horizontal fijo</b> (de la roseta al panel) y hasta <b>10 m de latiguillos</b> (los del puesto y los del armario). Por eso el cable instalado no debe pasar de 90 m.</div>
+</section>
+
+<!-- 4. tramos -->
+<section id="tramos">
+  <span class="eyebrow">Simulador 1 · ejercicio 4 de clase</span>
+  <h2>¿Cumple cada tramo?</h2>
+  <p class="lead">Para cada tramo horizontal elige el estándar, la categoría mínima y si cumple (categoría y distancia del cableado permanente).</p>
+  <div class="tbl-scroll"><table class="rellena" id="tramTabla"></table></div>
+  <div class="stepper"><button class="btn pri" id="tramOk">Comprobar</button><button class="btn" id="tramSol">Ver solución</button></div>
+  <div id="tramFb" aria-live="polite" style="display:grid;gap:6px"></div>
+</section>
+
+<!-- 5. PoE -->
+<section id="poe">
+  <span class="eyebrow">Energía y conectores</span>
+  <h2>PoE y conectores de cobre</h2>
+  <p><b>PoE</b> (Power over Ethernet, IEEE 802.3af/at/bt) lleva <b>electricidad por el mismo cable de datos</b>. Así se alimentan puntos de acceso, cámaras IP y teléfonos VoIP sin enchufe cerca. La corriente calienta el cable: en mazos grandes con mucha potencia se recomienda Cat 6A de cobre puro.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Conector</th><th>Características</th></tr></thead>
+    <tbody>
+      <tr><td><b>RJ-45</b> (8P8C)</td><td>El de Ethernet: 8 contactos. Macho en el latiguillo; hembra en la tarjeta, el switch y la roseta. Hay versiones apantalladas y para hilo rígido o flexible</td></tr>
+      <tr><td><b>RJ-11 / RJ-12</b></td><td>Telefonía (4 o 6 posiciones). Parecido pero más estrecho</td></tr>
+      <tr><td><b>GG45 / TERA</b></td><td>Para Cat 7/7A. Poco habituales</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 6. fibra -->
+<section id="fibra">
+  <span class="eyebrow">Luz por un hilo de vidrio</span>
+  <h2>Fibra óptica</h2>
+  <p>La luz viaja por el <b>núcleo</b> y no se escapa porque el <b>revestimiento</b> que lo rodea tiene un índice de refracción menor: la luz rebota en la frontera y queda atrapada. Un enlace necesita un <b>emisor</b> (LED o láser) que convierta la señal eléctrica en luz y un <b>fotodiodo</b> que haga lo contrario. Normalmente se usan <b>dos fibras</b>: una para enviar y otra para recibir (full-dúplex).</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th></th><th>Multimodo (MMF)</th><th>Monomodo (SMF)</th></tr></thead>
+    <tbody>
+      <tr><th>Núcleo / revestimiento</th><td>50/125 µm (modernas) o 62,5/125 µm (antiguas)</td><td>9/125 µm</td></tr>
+      <tr><th>Fuente de luz</th><td>LED o VCSEL (láser económico)</td><td>Láser (más caro y potente)</td></tr>
+      <tr><th>Longitud de onda</th><td>850 y 1300 nm</td><td>1310 y 1550 nm</td></tr>
+      <tr><th>Dispersión</th><td>Alta (modal): limita la distancia</td><td>Mínima</td></tr>
+      <tr><th>Distancia</th><td>300–550 m</td><td>10 km a más de 100 km</td></tr>
+      <tr><th>Coste de los equipos</th><td>Menor</td><td>Mayor</td></tr>
+      <tr><th>Uso</th><td>Cableado vertical de edificios, centros de datos</td><td>Entre edificios o ciudades, WAN, MAN, operadores</td></tr>
+      <tr><th>Color de cubierta</th><td>Naranja, aguamarina, verde lima</td><td><b>Amarillo</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:6px"><h3>Ventajas</h3>
+      <p>Enorme ancho de banda · atenuación muy baja (~0,2–0,35 dB/km en monomodo) · <b>inmune a EMI</b> y a descargas · difícil de «pinchar» sin cortarla · largas distancias y aislamiento eléctrico entre edificios.</p></div>
+    <div class="panel" style="display:grid;gap:6px"><h3>Inconvenientes</h3>
+      <p>Equipos ópticos más caros · instalación delicada (curvas, limpieza) · hacen falta herramientas y formación (fusionadora) · <b>no lleva energía</b> (no hay PoE) · frágil ante roturas y curvas bruscas.</p></div>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Conector</th><th>Cómo es</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td><b>LC</b></td><td>Pequeño, con pestaña (clic); en pares (dúplex)</td><td>El más común: switches, SFP, centros de datos</td></tr>
+      <tr><td><b>SC</b></td><td>Cuadrado, de empuje (push-pull)</td><td>Operadores, FTTH (la fibra de casa)</td></tr>
+      <tr><td><b>ST</b></td><td>Redondo, con bayoneta metálica</td><td>Instalaciones antiguas multimodo</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>Seguridad:</b> nunca mires directamente a una fibra o un conector activos. La luz láser es <b>invisible</b> y puede dañar el ojo.</div>
+  <div class="note"><b>Reglas de instalación:</b> limpiar siempre las puntas (una mota de polvo ya provoca pérdidas); radio de curvatura mínimo de unas 10 veces el diámetro del cable; empalmes por <b>fusión</b> (arco eléctrico, ~0,05 dB de pérdida) o <b>mecánicos</b> (más rápidos, más pérdida). Se pierde luz por longitud, conectores, empalmes y curvas.</div>
+</section>
+
+<!-- 7. coaxial -->
+<section id="coaxial">
+  <span class="eyebrow">El veterano</span>
+  <h2>Coaxial</h2>
+  <p>Núcleo de cobre → dieléctrico → malla → cubierta. Como el campo electromagnético queda encerrado entre el núcleo y la malla, protege bien frente a EMI y admite mucho ancho de banda.</p>
+  <div class="note">Ethernet sobre coaxial (10BASE2, 10BASE5) está <b>obsoleto</b>: era una topología en bus y un corte tiraba toda la red. Lo sustituyó el par trenzado en estrella (10BASE-T). Hoy el coaxial sigue en el <b>cablemódem (HFC)</b>, la TV, el CCTV analógico y las antenas.</div>
+</section>
+
+<!-- 8. compara -->
+<section id="compara">
+  <span class="eyebrow">Resumen</span>
+  <h2>Comparativa de medios guiados</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Medio</th><th>Velocidad</th><th>Distancia</th><th>Inmunidad a EMI</th><th>Coste</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td>Coaxial</td><td>Alta (HFC)</td><td>Cientos de m – km</td><td>Buena</td><td>Medio</td><td>TV por cable, CCTV</td></tr>
+      <tr><td>UTP</td><td>100 Mbps – 10 Gbps</td><td>100 m</td><td>Baja</td><td>Bajo</td><td>Puestos de trabajo</td></tr>
+      <tr><td>F/UTP, S/FTP</td><td>1 – 40 Gbps</td><td>100 m (Cat 8: 30 m)</td><td>Media-alta</td><td>Medio</td><td>Entornos con interferencias</td></tr>
+      <tr><td>Fibra multimodo</td><td>1 – 100 Gbps</td><td>300–550 m</td><td>Total</td><td>Medio-alto</td><td>Troncales de edificio, centros de datos</td></tr>
+      <tr><td>Fibra monomodo</td><td>1 Gbps – Tbps</td><td>10 km a &gt;100 km</td><td>Total</td><td>Alto</td><td>WAN, MAN, entre edificios</td></tr>
+    </tbody>
+  </table></div>
+</section>
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="senal.html">← Anterior: Señal y modulación</a>
+  <a href="crimpado.html">Siguiente: Crimpado y comprobador →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/cables.js"></script>
+</body>
+</html>

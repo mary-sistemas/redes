@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Señal y modulación · Repaso de Redes</title>
+<meta name="description" content="El nivel físico: señal analógica y digital, codificación de línea, modulación, modos de transmisión, factores que degradan la señal y ancho de banda.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT3 · La capa física</span>
+  <h1>Señal y modulación</h1>
+  <p>Cómo se convierte un 1 o un 0 en algo físico: un voltaje, un pulso de luz o una onda. Qué tipos de transmisión hay, qué estropea la señal por el camino y por qué tu conexión de 100 Mbps no descarga a 100 MB/s.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#idea">La idea</a>
+  <a class="chip" href="#funciones">Funciones</a>
+  <a class="chip" href="#tipos">Tipos de transmisión</a>
+  <a class="chip" href="#codificacion">Codificación</a>
+  <a class="chip" href="#modulacion">Modulación</a>
+  <a class="chip" href="#factores">Qué estropea la señal</a>
+  <a class="chip" href="#ancho">Ancho de banda</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+<!-- 1. idea -->
+<section id="idea">
+  <span class="eyebrow">La idea</span>
+  <h2>La única capa que toca el mundo real</h2>
+  <p>De la capa 2 para arriba todo son datos ordenados: tramas, paquetes, segmentos. La <b>capa física</b> es la única que se ocupa de cómo un 1 o un 0 se convierte en algo que existe: un <b>voltaje</b> en un cable de cobre, un <b>pulso de luz</b> en una fibra o una <b>onda de radio</b>. Su objetivo: que los bits que llegan sean los mismos que salieron.</p>
+  <div class="note"><b>Recuerda de la UT2:</b> en OSI es la capa 1 y su PDU son los bits. En TCP/IP va junto con la 2 en «Acceso a la red». En IEEE 802 queda por debajo de la subcapa MAC.</div>
+  <div class="note warn"><b>Un aparato de capa 1 no entiende de direcciones ni de tramas:</b> solo ve señales. Por eso un hub forma un único dominio de colisión, mientras que un switch (capa 2) separa un dominio de colisión por puerto.</div>
+</section>
+
+<!-- 2. funciones -->
+<section id="funciones">
+  <span class="eyebrow">Qué define el nivel físico</span>
+  <h2>Funciones</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Función</th><th>Qué define</th></tr></thead>
+    <tbody>
+      <tr><td>Características mecánicas</td><td>Conectores (RJ-45, LC, SFP), número y orden de pines, tipo de cable</td></tr>
+      <tr><td>Características eléctricas, ópticas o de radio</td><td>Voltajes, intensidad de luz, potencia, frecuencias</td></tr>
+      <tr><td>Codificación y modulación</td><td>Cómo se representa cada bit con la señal</td></tr>
+      <tr><td>Sincronización de bits</td><td>Que emisor y receptor coincidan en cuánto dura cada bit (reloj)</td></tr>
+      <tr><td>Velocidad</td><td>Bits por segundo: 10 Mbps, 1 Gbps, 10 Gbps…</td></tr>
+      <tr><td>Modo de transmisión</td><td>Simplex, half o full-dúplex; serie o paralelo</td></tr>
+      <tr><td>Topología física</td><td>Cómo se colocan los medios: bus, estrella, anillo, malla</td></tr>
+      <tr><td>Activar, mantener y liberar el enlace</td><td>Por ejemplo, la autonegociación con pulsos FLP</td></tr>
+    </tbody>
+  </table></div>
+  <p><b>Aparatos de nivel 1:</b> cables y conectores, la parte transmisora de la tarjeta de red (PHY) y los transceptores SFP, repetidores y hubs, conversores de medios (cobre ↔ fibra) y elementos pasivos (paneles de parcheo, latiguillos, rosetas). La <b>ONT</b> de la fibra de casa también convierte la señal, pero además trabaja en capas superiores (autentica, descifra y reparte el acceso).</p>
+</section>
+
+<!-- 3. tipos -->
+<section id="tipos">
+  <span class="eyebrow">Criterios independientes</span>
+  <h2>Tipos de transmisión</h2>
+  <p class="lead">Un mismo enlace se clasifica con varios criterios a la vez. Ethernet, por ejemplo, es <b>digital, serie, síncrona, full-dúplex (con switch), en banda base y guiada</b>.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Criterio</th><th>Opciones</th><th>Para entenderlo</th></tr></thead>
+    <tbody>
+      <tr><th>Tipo de señal</th><td><b>Analógica</b> (valores continuos) / <b>Digital</b> (valores discretos, normalmente 2)</td><td>La digital se puede regenerar sin arrastrar ruido; en la analógica el ruido se acumula</td></tr>
+      <tr><th>Bits a la vez</th><td><b>Paralelo</b> (varios hilos a la vez) / <b>Serie</b> (uno detrás de otro)</td><td>En paralelo, a alta velocidad los hilos se desfasan y hay diafonía: solo sirve en distancias muy cortas. Redes, USB, SATA y PCIe son serie</td></tr>
+      <tr><th>Sincronización</th><td><b>Asíncrona</b> (bit de inicio y de parada en cada carácter) / <b>Síncrona</b> (reloj compartido, bloques continuos)</td><td>Asíncrona: el puerto de consola. Síncrona: Ethernet y Wi-Fi, más eficiente</td></tr>
+      <tr><th>Sentido</th><td><b>Simplex</b> / <b>Half-dúplex</b> / <b>Full-dúplex</b></td><td>Simplex: TDT, teclado → PC. Half: hubs, Wi-Fi, walkie-talkie. Full: Ethernet con switch</td></tr>
+      <tr><th>Ancho del canal</th><td><b>Banda base</b> (una sola señal ocupa todo el medio) / <b>Banda ancha</b> (el medio se divide en canales de frecuencia)</td><td>Banda base: Ethernet (por eso se llama 100<b>BASE</b>-TX). Banda ancha: TV por cable, ADSL, canales Wi-Fi</td></tr>
+      <tr><th>Medio</th><td><b>Guiada</b> (cobre, fibra) / <b>No guiada</b> (radio, microondas, infrarrojos)</td><td>Visto en la UT1</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Matiz:</b> Gigabit Ethernet usa los 4 pares a la vez, pero no es transmisión paralela «clásica»: cada par va en serie y los datos se reparten entre ellos sin obligar a que lleguen a la vez.</div>
+  <div class="note warn"><b>Error clásico, duplex mismatch:</b> si un extremo se fija a mano en full-dúplex y el otro se deja en automático, este cae en half-dúplex. El enlace parece activo, pero hay colisiones, errores CRC y va lentísimo. Regla: <b>los dos en automático o los dos fijados igual</b>.</div>
+  <div class="panel reto">
+    <span class="eyebrow">Simulador 1 · clasifica</span>
+    <div class="q" id="claQ"></div>
+    <div class="opciones" id="claOps"></div>
+    <p id="claFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="claOtra">Otra</button><span class="marcador" id="claCuenta"></span></div>
+  </div>
+</section>
+
+<!-- 4. codificación -->
+<section id="codificacion">
+  <span class="eyebrow">Simulador 2 · datos digitales con señal digital</span>
+  <h2>Codificación de línea</h2>
+  <p class="lead">Son las reglas para traducir cada bit en un nivel de voltaje en el cable, sin onda portadora. Escribe tus bits y compara.</p>
+  <div class="panel" style="display:grid;gap:12px">
+    <div class="campo"><label>Bits<input id="bitsIn" value="10110001" maxlength="16" style="width:20ch" autocomplete="off" spellcheck="false"></label></div>
+    <div class="onda" id="ondaNRZ"></div>
+    <div class="onda" id="ondaMan"></div>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Código</th><th>Idea</th><th>Dónde</th></tr></thead>
+    <tbody>
+      <tr><td><b>NRZ</b></td><td>Un nivel para el 1 y otro para el 0. Simple, pero con muchos bits iguales seguidos la señal no cambia y el receptor <b>pierde el reloj</b></td><td>Fibra (con 8B/10B, 64B/66B), enlaces serie</td></tr>
+      <tr><td><b>Manchester</b></td><td>Cada bit cambia obligatoriamente <b>a la mitad</b>: el 1 sube y el 0 baja. Ese cambio sirve de reloj, pero la señal cambia el doble de rápido y gasta más ancho de banda</td><td>10BASE-T</td></tr>
+      <tr><td><b>PAM-5</b></td><td>5 niveles de voltaje: 2 bits por pulso y corrección de errores</td><td>1000BASE-T (con los 4 pares)</td></tr>
+      <tr><td><b>PAM-16</b></td><td>16 niveles; parejas de pulsos dan 256 combinaciones: 128 para 7 bits de datos y 128 para control</td><td>10GBASE-T</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>La lógica de fondo:</b> cuantos más niveles distintos tenga cada pulso, más bits caben en él y más rápido se va sin subir la frecuencia. A cambio, los niveles están más juntos y el ruido los confunde más fácilmente. Por eso las categorías altas de cable importan.</div>
+</section>
+
+<!-- 5. modulación -->
+<section id="modulacion">
+  <span class="eyebrow">Simulador 3 · datos digitales con señal analógica</span>
+  <h2>Modulación</h2>
+  <p class="lead">Por el aire no se pueden mandar «escalones» de voltaje: se usa una <b>onda portadora</b> y se le cambia algo según el bit. Mira los mismos bits con cada técnica.</p>
+  <div class="panel" style="display:grid;gap:12px">
+    <div class="filtros" role="group" aria-label="Modulación" id="modBtns">
+      <button class="chip on" data-m="ask">ASK · amplitud</button>
+      <button class="chip" data-m="fsk">FSK · frecuencia</button>
+      <button class="chip" data-m="psk">PSK · fase</button>
+    </div>
+    <div class="onda" id="ondaMod"></div>
+    <p id="modTxt"></p>
+  </div>
+  <div class="note"><b>QAM</b> combina a la vez amplitud (ASK) y fase (PSK). Así cada «símbolo» puede tener muchos estados distintos y transportar varios bits a la vez. Es lo que usan Wi-Fi y 4G/5G para ir tan rápido por el aire.</div>
+</section>
+
+<!-- 6. factores -->
+<section id="factores">
+  <span class="eyebrow">Ninguna señal llega igual que salió</span>
+  <h2>Qué estropea la señal</h2>
+  <div class="capas-tela">
+    <div style="--c:var(--l7)"><strong>Atenuación</strong>Pérdida de potencia por el camino (en dB). Aumenta con la <b>distancia</b>, la <b>frecuencia</b>, la mala calidad (conectores sucios, curvas), el <b>calor</b> y, en radio, los obstáculos. Es la razón de los 100 m del par trenzado.</div>
+    <div style="--c:var(--l6)"><strong>Ruido e interferencias</strong>Ruido térmico (siempre está), <b>EMI/RFI</b> de motores, microondas u otros Wi-Fi, y picos de ruido impulsivo. La fibra es inmune a EMI.</div>
+    <div style="--c:var(--l2)"><strong>Diafonía (crosstalk)</strong>La señal de un par «se cuela» en el par de al lado. Se combate con el trenzado (paso distinto en cada par), el apantallamiento, el separador en cruz y destrenzando lo mínimo.</div>
+    <div style="--c:var(--l4)"><strong>Retardo de propagación</strong>Lo que tarda la señal en llegar.</div>
+  </div>
+  <div class="note"><b>Relación señal/ruido (SNR):</b> cuánto más fuerte es la señal que el ruido, en dB. Con una SNR alta se pueden usar modulaciones con más estados (más bits por símbolo) y, por tanto, ir más rápido. Por eso el Wi-Fi baja de velocidad cuando te alejas.</div>
+</section>
+
+<!-- 7. ancho -->
+<section id="ancho">
+  <span class="eyebrow">Cuatro conceptos que se confunden</span>
+  <h2>Ancho de banda y tasa de transferencia</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Concepto</th><th>Qué es</th><th>Unidad</th></tr></thead>
+    <tbody>
+      <tr><td><b>Ancho de banda (analógico)</b></td><td>Rango de frecuencias que el medio transmite bien. Cat 5e: 100 MHz; un canal Wi-Fi: 20 MHz</td><td class="n">Hz</td></tr>
+      <tr><td><b>Ancho de banda (digital)</b> o capacidad nominal</td><td>Máximo teórico de bits por segundo: la «velocidad del enlace»</td><td class="n">bit/s</td></tr>
+      <tr><td><b>Throughput</b> (tasa de transferencia)</td><td>Lo que pasa de verdad en un momento, contando cabeceras, retransmisiones y colisiones. Siempre ≤ ancho de banda</td><td class="n">bit/s</td></tr>
+      <tr><td><b>Goodput</b> (capacidad útil)</td><td>Solo los datos de la aplicación, quitando cabeceras, retransmisiones y control</td><td class="n">bit/s</td></tr>
+    </tbody>
+  </table></div>
+  <p>Otros parámetros: <b>latencia</b> (lo que tarda en llegar, en ms), <b>jitter</b> (cuánto varía esa latencia; crítico en voz y vídeo) y <b>pérdida de paquetes</b> (%).</p>
+  <div class="panel" style="display:grid;gap:12px">
+    <span class="eyebrow">Simulador 4 · bits frente a bytes</span>
+    <div class="campo">
+      <label>Velocidad del enlace (Mbps)<input id="velMb" value="100" inputmode="decimal"></label>
+      <label>Tamaño del archivo (MB)<input id="tamMB" value="700" inputmode="decimal"></label>
+    </div>
+    <p id="velRes"></p>
+  </div>
+  <div class="note warn"><b>Mbps con «b» minúscula = megabits. MB con «B» mayúscula = megabytes.</b> 1 byte = 8 bits, así que un enlace de 100 Mbps transfiere como mucho 12,5 MB/s en teoría (y algo menos en la práctica por las cabeceras).</div>
+</section>
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="normas.html">← Anterior: Normalización e IEEE 802 (UT2)</a>
+  <a href="cables.html">Siguiente: Cables y categorías →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/senal.js"></script>
+</body>
+</html>

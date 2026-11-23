@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wi-Fi · Repaso de Redes</title>
+<meta name="description" content="IEEE 802.11: bandas y canales, normas, BSS y ESS, CSMA/CA, cómo se conecta una estación, amenazas, WPA2 y WPA3, y comandos en Windows y Linux.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT3 · La capa física</span>
+  <h1>Wi-Fi</h1>
+  <p>Cómo funciona una red inalámbrica de verdad: por qué en 2,4 GHz solo valen los canales 1, 6 y 11, qué es un BSSID, qué pasa cuando tu móvil se conecta, por qué ocultar el SSID no protege nada y qué comandos usar para ver tu Wi-Fi.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#idea">Wi-Fi frente a Ethernet</a>
+  <a class="chip" href="#ondas">Ondas y antenas</a>
+  <a class="chip" href="#canales">Canales</a>
+  <a class="chip" href="#normas">Normas 802.11</a>
+  <a class="chip" href="#arquitectura">BSS y ESS</a>
+  <a class="chip" href="#csma">CSMA/CA</a>
+  <a class="chip" href="#conexion">Conectarse</a>
+  <a class="chip" href="#seguridad">Seguridad</a>
+  <a class="chip" href="#comandos">Comandos</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+<!-- 1. idea -->
+<section id="idea">
+  <span class="eyebrow">IEEE 802.11</span>
+  <h2>Wi-Fi frente a Ethernet</h2>
+  <p><b>802.11</b> define la capa física (radio) y la subcapa MAC (con CSMA/CA); por encima va la misma LLC (802.2) que en Ethernet. <b>Wi-Fi</b> es la marca de la <b>Wi-Fi Alliance</b>, que certifica que equipos de marcas distintas son compatibles.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th></th><th>Ethernet (802.3)</th><th>Wi-Fi (802.11)</th></tr></thead>
+    <tbody>
+      <tr><th>Medio</th><td>Un cable para cada enlace</td><td>El aire, compartido por todos</td></tr>
+      <tr><th>Dúplex</th><td>Full-dúplex con switch</td><td><b>Half-dúplex</b></td></tr>
+      <tr><th>Acceso al medio</th><td>CSMA/CD (histórico)</td><td>CSMA/CA + ACK</td></tr>
+      <tr><th>Fiabilidad</th><td>Muy alta</td><td>Variable (distancia, obstáculos, interferencias)</td></tr>
+      <tr><th>Seguridad física</th><td>Hay que llegar al cable</td><td>La señal sale del edificio: <b>cifrar es imprescindible</b></td></tr>
+      <tr><th>Movilidad</th><td>Ninguna</td><td>Sí (roaming)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 2. ondas -->
+<section id="ondas">
+  <span class="eyebrow">Física de la radio</span>
+  <h2>Ondas, obstáculos y antenas</h2>
+  <p><b>Regla general:</b> a más frecuencia, más ancho de banda (más velocidad) pero <b>menos alcance</b> y peor paso a través de obstáculos. Por eso 2,4 GHz llega más lejos que 5 GHz, y 5 GHz más que 6 GHz.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Obstáculo</th><th>Atenuación aprox. (2,4 GHz)</th></tr></thead>
+    <tbody>
+      <tr><td>Cristal</td><td class="n">2–4 dB</td></tr><tr><td>Pladur</td><td class="n">3–5 dB</td></tr>
+      <tr><td>Ladrillo</td><td class="n">6–10 dB</td></tr><tr><td>Hormigón, forjado</td><td class="n">10–20 dB</td></tr>
+      <tr><td>Metal, espejos, ascensores, agua (acuarios, personas)</td><td>Muy alta</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Para entender los dB:</b> cada 3 dB es la mitad de potencia y cada 6 dB, una cuarta parte. Aunque no haya obstáculos, la señal pierde fuerza porque se reparte en un espacio cada vez más grande: duplicar la distancia son 6 dB más de pérdida.</div>
+  <p>La señal rebota (<b>reflexión</b>), se desvía al atravesar materiales (<b>refracción</b>) y se curva en los bordes (<b>difracción</b>). Todo junto produce el <b>multitrayecto</b>: llegan copias por caminos distintos. <b>MIMO</b> (varias antenas, 2×2, 4×4…) aprovecha esos caminos para mandar varios flujos a la vez. Las antenas pueden ser <b>omnidireccionales</b> (en todas direcciones, en forma de rosquilla: las de los routers) o <b>direccionales</b> (concentran la señal: radioenlaces). <b>Beamforming</b>: el AP dirige la señal hacia el cliente.</p>
+</section>
+
+<!-- 3. canales -->
+<section id="canales">
+  <span class="eyebrow">Simulador 1 · 2,4 GHz</span>
+  <h2>¿Por qué solo 1, 6 y 11?</h2>
+  <p class="lead">En Europa hay 13 canales, separados solo <b>5 MHz</b> entre sí, pero cada uno ocupa unos <b>20 MHz</b>. Activa canales y mira cuáles se pisan.</p>
+  <div class="panel onda" style="display:grid;gap:12px">
+    <div class="filtros" role="group" aria-label="Canales" id="chBtns"></div>
+    <svg id="chSvg" viewBox="0 0 640 170" role="img" aria-label="Canales de 2,4 GHz"></svg>
+    <p id="chTxt" aria-live="polite"></p>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Banda</th><th>Canales</th><th>Detalles</th></tr></thead>
+    <tbody>
+      <tr><td class="n">2,4 GHz</td><td>13 en la UE; no solapados: <b>1, 6 y 11</b></td><td>La más saturada (Bluetooth, Zigbee, microondas…). Canales de 40 MHz no recomendables</td></tr>
+      <tr><td class="n">5 GHz</td><td>~19 canales de 20 MHz no solapados (36–48, 52–64, 100–140)</td><td>52–64 y 100–140 usan <b>DFS</b>: si detectan un radar deben cambiar de canal (cortes breves). <b>36–48 son los más estables</b></td></tr>
+      <tr><td class="n">6 GHz</td><td>24 de 20 MHz, o de 160 y 320 MHz</td><td>Solo equipos modernos (Wi-Fi 6E/7) y <b>exige WPA3</b>. Menor alcance</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note">A mayor <b>ancho de canal</b> (20, 40, 80, 160, 320 MHz) más velocidad, pero caben menos canales y es más fácil chocar con los vecinos.</div>
+  <div class="panel reto">
+    <span class="eyebrow">Simulador 2 · ejercicio 12 de clase</span>
+    <div class="q">Escaneas y ves en 2,4 GHz: <b>Aula-Redes</b> (canal 6, señal 78), <b>Biblioteca</b> (canal 1, 64), <b>Cafetería</b> (canal 6, 55) y <b>Taller</b> (canal 11, 40). ¿Qué canal eliges para un AP nuevo?</div>
+    <div class="opciones" id="escOps"></div>
+    <p id="escFb" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- 4. normas -->
+<section id="normas">
+  <span class="eyebrow">Ejercicio 7 de clase</span>
+  <h2>Normas 802.11</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Norma</th><th>Año</th><th>Banda</th><th>Velocidad teórica</th><th>Nombre</th></tr></thead>
+    <tbody>
+      <tr><td class="n">802.11</td><td>1997</td><td>2,4 GHz</td><td>2 Mbps</td><td>—</td></tr>
+      <tr><td class="n">802.11b</td><td>1999</td><td>2,4 GHz</td><td>11 Mbps</td><td>Wi-Fi 1</td></tr>
+      <tr><td class="n">802.11a</td><td>1999</td><td>5 GHz</td><td>54 Mbps</td><td>Wi-Fi 2</td></tr>
+      <tr><td class="n">802.11g</td><td>2003</td><td>2,4 GHz</td><td>54 Mbps</td><td>Wi-Fi 3</td></tr>
+      <tr><td class="n">802.11n</td><td>2009</td><td>2,4 y 5 GHz</td><td>600 Mbps</td><td>Wi-Fi 4</td></tr>
+      <tr><td class="n">802.11ac</td><td>2013</td><td>5 GHz</td><td>1,3 Gbps (1.ª gen.) → ~6,9 Gbps</td><td>Wi-Fi 5</td></tr>
+      <tr><td class="n">802.11ax</td><td>2019–21</td><td>2,4, 5 y 6 GHz (6E)</td><td>9,6 Gbps</td><td>Wi-Fi 6 / 6E</td></tr>
+      <tr><td class="n">802.11be</td><td>2024</td><td>2,4, 5 y 6 GHz</td><td>~46 Gbps</td><td>Wi-Fi 7</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Truco:</b> «a» y «ac» son solo de 5 GHz; «b» y «g», solo de 2,4 GHz; desde «n» se usan varias bandas.</div>
+  <div class="note warn"><b>Un equipo antiguo frena a todos:</b> son compatibles hacia atrás, pero si se conecta un 802.11b el AP tiene que «hablar» despacio en esos momentos y la celda entera rinde menos. Solución: separar bandas y desactivar las velocidades antiguas si no hacen falta.</div>
+  <div class="panel reto">
+    <span class="eyebrow">Simulador 3 · ¿qué norma?</span>
+    <div class="q" id="norQ"></div>
+    <div class="opciones" id="norOps"></div>
+    <p id="norFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="norOtra">Otra</button><span class="marcador" id="norCuenta"></span></div>
+  </div>
+</section>
+
+<!-- 5. arquitectura -->
+<section id="arquitectura">
+  <span class="eyebrow">Piezas de una WLAN</span>
+  <h2>STA, AP, BSS, SSID y ESS</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Término</th><th>Qué es</th></tr></thead>
+    <tbody>
+      <tr><td><b>STA</b></td><td>Estación: cualquier equipo con tarjeta inalámbrica (portátil, móvil, impresora)</td></tr>
+      <tr><td><b>AP</b></td><td>Punto de acceso: une las STA con la red cableada</td></tr>
+      <tr><td><b>BSS</b></td><td>La celda: el área que cubre un AP con sus estaciones</td></tr>
+      <tr><td><b>BSSID</b></td><td>Identificador de la BSS: la <b>MAC del AP</b> (de la radio que da servicio)</td></tr>
+      <tr><td><b>SSID</b></td><td>El <b>nombre</b> de la red (hasta 32 caracteres). Es un nombre, no una medida de seguridad</td></tr>
+      <tr><td><b>DS</b></td><td>Sistema de distribución: la red (normalmente Ethernet) que une varios AP</td></tr>
+      <tr><td><b>ESS</b></td><td>Varias BSS unidas por el DS con el <b>mismo SSID</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:8px"><h3>Modo ad-hoc</h3><p>Los equipos hablan <b>directamente entre sí</b>, sin AP (Wi-Fi Direct, compartir archivos entre portátiles). Fácil y barato, pero no escala, poco alcance y sin salida a Internet salvo que alguien la comparta.</p></div>
+    <div class="panel" style="display:grid;gap:8px"><h3>Modo infraestructura</h3><p>Todo pasa por el <b>AP</b>, que es el centro de la estrella. Es el de casas y empresas. La estación tiene que <b>asociarse</b> al AP.</p></div>
+  </div>
+  <div class="note"><b>Roaming:</b> para cubrir un edificio se ponen varios AP unidos por cable y con el <b>mismo SSID</b> (cada uno con su BSSID). Al moverte, tu equipo se reasocia al AP más cercano. Buenas prácticas: que las celdas se solapen un 10–20 %, canales distintos en celdas vecinas (1-6-11), muchos AP a poca potencia mejor que pocos a mucha, y cada AP cableado con PoE.</div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Dispositivo</th><th>Qué hace</th><th>Ojo</th></tr></thead>
+    <tbody>
+      <tr><td>Repetidor / extensor</td><td>Recibe la señal del AP y la retransmite</td><td>Con una sola radio, el rendimiento cae a la mitad o menos</td></tr>
+      <tr><td>Puente inalámbrico</td><td>Une dos redes cableadas por radio, punto a punto</td><td>Entre edificios, con antenas direccionales y línea de visión</td></tr>
+      <tr><td>Punto de acceso</td><td>Conecta clientes Wi-Fi a la LAN</td><td><b>No enruta</b>: pasa tramas entre radio y Ethernet</td></tr>
+      <tr><td>Router inalámbrico</td><td>Router + switch + AP + DHCP + NAT + cortafuegos</td><td>El de casa. Si lo usas como AP, se desactivan DHCP y NAT</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 6. csma -->
+<section id="csma">
+  <span class="eyebrow">Acceso al medio</span>
+  <h2>CSMA/CA paso a paso</h2>
+  <div class="panel" style="display:grid;gap:8px">
+    <p><b>1.</b> La estación escucha el canal.</p>
+    <p><b>2.</b> Si está libre un tiempo, espera además un tiempo <b>aleatorio</b> (backoff).</p>
+    <p><b>3.</b> Si sigue libre, transmite.</p>
+    <p><b>4.</b> El receptor contesta con un <b>ACK</b>.</p>
+    <p><b>5.</b> Si no llega el ACK, supone que hubo colisión: duplica la ventana de espera y reintenta.</p>
+  </div>
+  <div class="note"><b>El nodo oculto:</b> A y C llegan al AP, pero no se oyen entre sí (por distancia o una pared). Los dos creen que el canal está libre y transmiten a la vez: chocan en el AP. Solución opcional: pedir permiso al AP antes (<b>RTS</b>) y esperar su autorización (<b>CTS</b>).</div>
+  <p><b>Tipos de trama 802.11:</b> de <b>gestión</b> (beacons con el SSID, peticiones de asociación; sin datos), de <b>control</b> (ACK, RTS, CTS) y de <b>datos</b> (el tráfico IP real). La trama Wi-Fi puede llevar hasta <b>4 direcciones MAC</b>, frente a las 2 de Ethernet.</p>
+</section>
+
+<!-- 7. conexión -->
+<section id="conexion">
+  <span class="eyebrow">Simulador 4 · ordena</span>
+  <h2>Qué pasa cuando tu móvil se conecta</h2>
+  <div class="panel" style="display:grid;gap:8px">
+    <p><b>Descubrimiento:</b> escucha los <b>beacons</b> que manda el AP (pasivo) o pregunta con una <b>probe request</b> (activo). Así sabe el SSID, el canal y la seguridad.</p>
+    <p><b>Autenticación 802.11:</b> un trámite abierto, sin credenciales. La identidad real se comprueba después.</p>
+    <p><b>Asociación:</b> pide unirse; el AP acepta y le da un identificador (AID). Ya forma parte de la BSS.</p>
+    <p><b>Negociación de claves:</b> con WPA2/WPA3 se comprueba la clave y se generan las claves de cifrado.</p>
+    <p><b>Datos:</b> se desbloquea el tráfico cifrado (IP).</p>
+    <p><b>Movilidad y desconexión:</b> se reasocia a otro AP del mismo SSID (roaming) o se desasocia.</p>
+  </div>
+  <div class="panel" style="display:grid;gap:10px">
+    <span class="eyebrow">Ordénalos tú</span>
+    <div class="orden-list" id="conLista"></div>
+    <p id="conFb"></p>
+    <div class="stepper"><button class="btn" id="conReset">Barajar otra vez</button></div>
+  </div>
+</section>
+
+<!-- 8. seguridad -->
+<section id="seguridad">
+  <span class="eyebrow">El aire es de todos</span>
+  <h2>Amenazas y protección</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Amenaza</th><th>Qué es</th></tr></thead>
+    <tbody>
+      <tr><td>Escucha pasiva (sniffing)</td><td>Capturar el tráfico con un adaptador en modo monitor. Sin cifrado, se lee todo</td></tr>
+      <tr><td>Acceso no autorizado</td><td>Entrar en una red con clave débil o sin clave</td></tr>
+      <tr><td>Rogue AP</td><td>Un AP no autorizado enchufado a la red interna</td></tr>
+      <tr><td>Evil twin</td><td>Un AP falso que copia el SSID de uno real para interceptar a quien se conecte</td></tr>
+      <tr><td>MAC spoofing</td><td>Suplantar la MAC de un equipo permitido para saltarse un filtro MAC</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Protocolo</th><th>Año</th><th>Cifrado</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td>Abierta</td><td>—</td><td>Ninguno</td><td>No usar</td></tr>
+      <tr><td><b>WEP</b></td><td>1997</td><td>RC4</td><td><b>Roto</b>: se descifra en minutos</td></tr>
+      <tr><td>WPA</td><td>2003</td><td>TKIP</td><td>Obsoleto</td></tr>
+      <tr><td><b>WPA2</b></td><td>2004</td><td>AES-CCMP</td><td>Seguro con clave robusta</td></tr>
+      <tr><td><b>WPA3</b></td><td>2018</td><td>AES (autenticación SAE)</td><td><b>Recomendado</b>: resiste ataques de diccionario offline</td></tr>
+      <tr><td>OWE</td><td>2018</td><td>Cifrado individual sin contraseña</td><td>Para redes públicas, mejor que abierta</td></tr>
+    </tbody>
+  </table></div>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:8px"><h3>Personal (PSK / SAE)</h3><p>Una contraseña común para todos. Para casa y oficinas pequeñas, con clave larga (12–16 caracteres o más).</p></div>
+    <div class="panel" style="display:grid;gap:8px"><h3>Enterprise (802.1X + RADIUS)</h3><p>Cada usuario con sus credenciales. Puedes dar de baja a uno sin cambiar la clave de todos. Lo habitual en empresas e institutos.</p></div>
+  </div>
+  <div class="note warn"><b>Medidas que parecen seguridad y no lo son:</b> <b>ocultar el SSID</b> (sigue viajando en las peticiones y la asociación; cualquier analizador lo ve) y el <b>filtrado MAC</b> (las MAC van en claro y se suplantan). Lo que sí sirve: WPA3 (o WPA2/WPA3 mixto), clave robusta, cambiar la contraseña del router, <b>desactivar WPS</b>, actualizar el firmware y separar invitados en otra red o VLAN.</div>
+  <div class="panel reto">
+    <span class="eyebrow">Simulador 5 · ¿sirve o no sirve?</span>
+    <div class="q" id="segQ"></div>
+    <div class="opciones" id="segOps"></div>
+    <p id="segFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="segOtra">Otra</button><span class="marcador" id="segCuenta"></span></div>
+  </div>
+</section>
+
+<!-- 9. comandos -->
+<section id="comandos">
+  <span class="eyebrow">Práctica</span>
+  <h2>Comandos para ver y conectar el Wi-Fi</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Tarea</th><th>Windows</th><th>Linux</th></tr></thead>
+    <tbody>
+      <tr><td>Ver adaptadores</td><td class="n">ipconfig /all</td><td class="n">ip a</td></tr>
+      <tr><td>Conexión actual (SSID, canal, señal)</td><td class="n">netsh wlan show interfaces</td><td class="n">iw dev wlan0 link · nmcli dev wifi</td></tr>
+      <tr><td>Listar redes</td><td class="n">netsh wlan show networks mode=bssid</td><td class="n">nmcli dev wifi list</td></tr>
+      <tr><td>Conectar</td><td class="n">netsh wlan connect name="SSID"</td><td class="n">nmcli dev wifi connect "SSID" password "clave"</td></tr>
+      <tr><td>¿Radio bloqueada?</td><td>Modo avión / Administrador de dispositivos</td><td class="n">rfkill list · rfkill unblock wifi</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Diagnóstico de abajo arriba:</b> 1) enlace (LED o SSID con buena señal) → 2) IP con <code>ipconfig /all</code> o <code>ip a</code> (una <b>169.254.x.x</b> significa que el DHCP no ha respondido) → 3) <code>ping</code> a la puerta de enlace → 4) <code>ping 8.8.8.8</code> → 5) nombres con <code>ping www.ejemplo.com</code> o <code>nslookup</code> → 6) <code>tracert</code>/<code>traceroute</code>. Si falla un paso, el problema está en esa capa.</div>
+  <div class="note"><b>Configurar un AP:</b> conectarlo a un puerto LAN (no WAN si va como AP) → entrar por navegador a su IP y cambiar la contraseña → actualizar firmware → LAN (si va solo como AP: sin DHCP ni NAT y con IP fija de la red) → SSID, modo, canal manual, ancho (20 MHz en 2,4; 40/80 en 5) y potencia → WPA3, WPS desactivado y sin administración remota → guardar copia → probar con clientes.</div>
+</section>
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="crimpado.html">← Anterior: Crimpado y comprobador</a>
+  <a href="estructurado.html">Siguiente: Cableado estructurado →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/wifi.js"></script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crimpado y comprobador · Repaso de Redes</title>
+<meta name="description" content="T568A y T568B, cable directo, cruzado y de consola, cómo crimpar un RJ-45 y cómo leer los LED del comprobador.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT3 · La capa física</span>
+  <h1>Crimpado y comprobador</h1>
+  <p>El tema que entra seguro: el orden de colores, qué cable va entre cada par de equipos, los errores típicos al crimpar y cómo diagnosticarlos solo mirando las luces del comprobador.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#colores">T568A y T568B</a>
+  <a class="chip" href="#monta">Monta un RJ-45</a>
+  <a class="chip" href="#tipos">Tipos de cable</a>
+  <a class="chip" href="#pasos">Paso a paso</a>
+  <a class="chip" href="#errores">Errores</a>
+  <a class="chip" href="#tester">Comprobador</a>
+  <a class="chip" href="#diagnostica">Diagnostica</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+<!-- 1. colores -->
+<section id="colores">
+  <span class="eyebrow">La norma ANSI/TIA-568</span>
+  <h2>T568A y T568B</h2>
+  <p>Un cable Cat 5e/6 tiene <b>4 pares</b>: naranja, verde, azul y marrón. Cada par tiene un hilo de color sólido y otro <b>blanco con raya</b> del mismo color. La norma define dos órdenes para colocarlos en el RJ-45. Se mira el conector <b>con el clip hacia abajo y los contactos hacia ti</b>: el pin 1 queda a la izquierda.</p>
+  <div class="ab">
+    <div class="panel" style="display:grid;gap:26px"><h3>T568B · el más usado en España</h3><div class="hilos" id="norB"></div></div>
+    <div class="panel" style="display:grid;gap:26px"><h3>T568A</h3><div class="hilos" id="norA"></div></div>
+  </div>
+  <div class="note"><b>Cómo acordarte sin memorizar dos listas:</b> aprende solo la B: <b>blanco-naranja, naranja, blanco-verde, azul, blanco-azul, verde, blanco-marrón, marrón</b>. La A es la misma pero <b>cambiando el par naranja por el verde</b> (pines 1-2 ↔ 3-6). El azul (4-5) y el marrón (7-8) no se mueven nunca.</div>
+  <div class="note"><b>Fíjate en algo curioso:</b> el par azul va en el centro (4 y 5) y el par de los pines 3 y 6 está «partido», con el azul en medio. No es un capricho: así se respeta la compatibilidad con la telefonía, que usa los pines centrales.</div>
+  <div class="note warn"><b>Lo importante no es A o B</b>, sino que cada par esté bien emparejado y que en toda la instalación se use <b>el mismo estándar</b> en todos los extremos (rosetas, panel y latiguillos).</div>
+</section>
+
+<!-- 2. monta -->
+<section id="monta">
+  <span class="eyebrow">Simulador 1 · ordena los hilos</span>
+  <h2>Monta un conector</h2>
+  <p class="lead">Elige el estándar y pulsa los hilos en orden, del pin 1 al 8. Luego compruébalo.</p>
+  <div class="panel" style="display:grid;gap:16px">
+    <div class="filtros" role="group" aria-label="Estándar a montar">
+      <button class="chip on" data-std="B">Montar T568B</button>
+      <button class="chip" data-std="A">Montar T568A</button>
+    </div>
+    <div class="hilos" id="montaje" aria-label="Conector, pines 1 a 8" style="margin-bottom:18px"></div>
+    <span class="eyebrow">Hilos disponibles</span>
+    <div class="paleta" id="paleta"></div>
+    <div class="stepper"><button class="btn pri" id="montOk">Comprobar</button><button class="btn" id="montDeshacer">Deshacer</button><button class="btn" id="montBorra">Empezar de nuevo</button></div>
+    <p id="montFb" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- 3. tipos -->
+<section id="tipos">
+  <span class="eyebrow">Directo, cruzado y consola</span>
+  <h2>¿Qué cable va entre cada par de equipos?</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Tipo</th><th>Extremo 1</th><th>Extremo 2</th><th>Para conectar</th></tr></thead>
+    <tbody>
+      <tr><td><b>Directo</b></td><td>T568B</td><td>T568B</td><td>Equipos <b>distintos</b>: PC ↔ switch, router ↔ switch, AP ↔ switch, PC ↔ roseta</td></tr>
+      <tr><td><b>Cruzado</b></td><td>T568B</td><td>T568A</td><td>Equipos <b>iguales</b>: PC ↔ PC, switch ↔ switch, router ↔ router, router ↔ PC, hub ↔ switch</td></tr>
+      <tr><td><b>Consola</b> (rollover)</td><td>T568B</td><td>Orden invertido</td><td>Puerto de consola de un router o switch ↔ PC (con adaptador DB-9 o USB)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>¿Por qué existe el cruzado?</b> Cada equipo transmite por unos pines y recibe por otros. Un PC transmite por 1-2 y recibe por 3-6; un switch hace justo lo contrario. Entre equipos distintos «encaja» con un directo. Entre dos iguales, los dos transmitirían por los mismos pines: hay que <b>cruzar</b> para que lo que uno envía llegue a lo que el otro recibe. El router se comporta como un PC, por eso router ↔ PC también es cruzado.</div>
+  <div class="note"><b>Hoy, con Auto-MDI/MDI-X</b>, los puertos detectan qué pares transmiten y lo corrigen solos, así que un directo vale casi para todo (en Gigabit es obligatorio). Pero en el examen y en Packet Tracer hay que saber cuál toca.</div>
+  <div class="panel reto">
+    <span class="eyebrow">Simulador 2 · ejercicio 5 de clase</span>
+    <div class="q" id="tipQ"></div>
+    <div class="opciones" id="tipOps"></div>
+    <p id="tipFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="tipOtra">Otro</button><span class="marcador" id="tipCuenta"></span></div>
+  </div>
+</section>
+
+<!-- 4. pasos -->
+<section id="pasos">
+  <span class="eyebrow">Simulador 3 · procedimiento</span>
+  <h2>Montar un latiguillo paso a paso</h2>
+  <div class="panel" style="display:grid;gap:10px">
+    <p><b>1.</b> Medir y cortar el cable (con algo de margen).</p>
+    <p><b>2.</b> Pelar <b>2,5–3 cm</b> de cubierta sin cortar el aislante de los hilos.</p>
+    <p><b>3.</b> Separar y destrenzar los 4 pares; quitar la cruceta si la hay.</p>
+    <p><b>4.</b> Ordenar los 8 hilos en T568B (clip hacia abajo) y estirarlos.</p>
+    <p><b>5.</b> Cortar a ras dejando <b>12–14 mm</b> de hilo visible.</p>
+    <p><b>6.</b> Meter los hilos <b>hasta el fondo</b> (se ven los 8 cobres en la punta) y que la <b>cubierta entre</b> en el conector.</p>
+    <p><b>7.</b> Crimpar con firmeza.</p>
+    <p><b>8.</b> Repetir en el otro extremo: T568B (directo) o T568A (cruzado).</p>
+    <p><b>9.</b> Comprobar con el tester y etiquetar.</p>
+  </div>
+  <div class="panel" style="display:grid;gap:10px">
+    <span class="eyebrow">Ahora tú: ordénalos sin mirar arriba</span>
+    <div class="orden-list" id="ordLista"></div>
+    <p id="ordFb"></p>
+    <div class="stepper"><button class="btn" id="ordReset">Barajar otra vez</button></div>
+  </div>
+</section>
+
+<!-- 5. errores -->
+<section id="errores">
+  <span class="eyebrow">Entra seguro en el examen</span>
+  <h2>Errores frecuentes al crimpar</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Error</th><th>Efecto</th><th>¿Por qué?</th></tr></thead>
+    <tbody>
+      <tr><td>Los hilos no llegan al fondo</td><td>Contacto defectuoso: <b>cable abierto</b></td><td>La cuchilla del contacto no llega a perforar ese hilo</td></tr>
+      <tr><td>La cubierta queda fuera del conector</td><td>Se suelta o se rompe al tirar</td><td>El retenedor aprieta los hilos sueltos en vez de la cubierta: no hay sujeción mecánica</td></tr>
+      <tr><td>Orden de colores incorrecto</td><td>Cable cruzado o <b>par dividido</b></td><td>Los hilos de un mismo par acaban en pines que no son pareja</td></tr>
+      <tr><td>Destrenzar demasiado</td><td>Más diafonía; no llega a la categoría</td><td>El trenzado es lo que cancela las interferencias</td></tr>
+      <tr><td>Pelar mucho o dañar el aislante</td><td><b>Cortocircuito</b> entre hilos</td><td>Dos cobres pelados se tocan</td></tr>
+      <tr><td>Mezclar A y B sin querer</td><td>Sale cruzado en vez de directo (o al revés)</td><td>Un extremo en cada norma = cruzado</td></tr>
+      <tr><td>Conector equivocado (rígido/flexible u otra categoría)</td><td>Conexión inestable o por debajo de la categoría</td><td>Los contactos están hechos para un tipo de hilo concreto</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>Ojo con el par dividido:</b> si cruzas hilos de pares distintos pero lo haces igual en los dos extremos, el comprobador básico da 1-2-3-4-5-6-7-8 «perfecto», porque solo mira continuidad. El cable funcionará mal por diafonía. Solo lo detecta un certificador.</div>
+</section>
+
+<!-- 6. tester -->
+<section id="tester">
+  <span class="eyebrow">Simulador 4 · el comprobador</span>
+  <h2>Cómo leer las luces</h2>
+  <p class="lead">El módulo <b>principal</b> manda señal por cada hilo en orden (1, 2… 8 y G). El <b>remoto</b> enciende el LED del pin por donde le llega. Elige un cable y pulsa «Probar».</p>
+  <div class="panel tester">
+    <div class="filtros" role="group" aria-label="Cable a probar" id="casos"></div>
+    <div class="leds" id="ledP"><span class="lbl">Principal</span></div>
+    <div class="leds" id="ledR"><span class="lbl">Remoto</span></div>
+    <p>Secuencia del remoto: <span class="secuencia" id="secR">—</span></p>
+    <p id="testTxt"></p>
+    <div class="stepper"><button class="btn pri" id="probar">Probar</button></div>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Lo que ves en el remoto</th><th>Diagnóstico</th></tr></thead>
+    <tbody>
+      <tr><td class="n">1-2-3-4-5-6-7-8 (igual que el principal)</td><td>Cable <b>directo</b> correcto</td></tr>
+      <tr><td class="n">3-6-1-4-5-2-7-8</td><td>Cable <b>cruzado</b> correcto (T568B ↔ T568A)</td></tr>
+      <tr><td>Un LED no se enciende</td><td>Hilo <b>abierto</b>: cortado o mal crimpado (no llega al fondo)</td></tr>
+      <tr><td>Dos LED a la vez</td><td><b>Cortocircuito</b> entre esos hilos</td></tr>
+      <tr><td>Un LED en posición cambiada (y no es la secuencia del cruzado)</td><td>Hilos <b>invertidos</b> o mal ordenados</td></tr>
+      <tr><td>Ningún LED</td><td>Cable roto o no conectado</td></tr>
+      <tr><td>LED G apagado</td><td>Malla o pantalla sin continuidad (en apantallados)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>De dónde sale 3-6-1-4-5-2-7-8:</b> en el cruzado, el par naranja (1-2) y el verde (3-6) cambian de sitio. Lo que sale por el 1 llega al 3, el 2 al 6, el 3 al 1 y el 6 al 2. Los pines 4, 5, 7 y 8 no se mueven.</div>
+  <div class="note warn"><b>Límite del comprobador básico:</b> solo comprueba continuidad y orden. No mide atenuación, diafonía ni longitud, así que <b>no puede garantizar que un enlace cumpla Cat 6A</b>. Para eso hace falta un <b>certificador</b>.</div>
+</section>
+
+<!-- 7. diagnostica -->
+<section id="diagnostica">
+  <span class="eyebrow">Simulador 5 · ejercicio 6 de clase</span>
+  <h2>Diagnostica tú</h2>
+  <p class="lead">El principal enciende 1-2-3-4-5-6-7-8 y el extremo A está en T568B. ¿Qué le pasa al cable?</p>
+  <div class="panel reto">
+    <div class="q" id="diaQ"></div>
+    <div class="opciones" id="diaOps"></div>
+    <p id="diaFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="diaOtra">Otro</button><span class="marcador" id="diaCuenta"></span></div>
+  </div>
+</section>
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="cables.html">← Anterior: Cables y categorías</a>
+  <a href="wifi.html">Siguiente: Wi-Fi →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/crimpado.js"></script>
+</body>
+</html>

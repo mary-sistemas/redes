@@ -13,11 +13,11 @@ Web interactiva para repasar el módulo de **Planificación y Administración de
 | UT2 | Capas y protocolos | ✅ Disponible |
 | UT2 | Wireshark y tramas | ✅ Disponible |
 | UT2 | Normalización e IEEE 802 | ✅ Disponible |
-| UT3 | Señal y modulación | Próximamente |
-| UT3 | Cables y categorías | Próximamente |
-| UT3 | Crimpado y comprobador | Próximamente |
-| UT3 | Wi-Fi | Próximamente |
-| UT3 | Cableado estructurado | Próximamente |
+| UT3 | Señal y modulación | ✅ Disponible |
+| UT3 | Cables y categorías | ✅ Disponible |
+| UT3 | Crimpado y comprobador | ✅ Disponible |
+| UT3 | Wi-Fi | ✅ Disponible |
+| UT3 | Cableado estructurado | ✅ Disponible |
 
 ## Estructura
 
@@ -29,7 +29,12 @@ repaso-redes/
 │   ├── redes-locales.html
 │   ├── capas.html
 │   ├── wireshark.html
-│   └── normas.html
+│   ├── normas.html
+│   ├── senal.html
+│   ├── cables.html
+│   ├── crimpado.html
+│   ├── wifi.html
+│   └── estructurado.html
 ├── assets/
 │   ├── estilos.css     estilos comunes (tema claro y oscuro)
 │   ├── comun.js        botón de tema y progreso guardado
@@ -37,7 +42,9 @@ repaso-redes/
 │   ├── redes-locales.js
 │   ├── capas.js
 │   ├── wireshark.js
-│   └── normas.js
+│   ├── normas.js
+│   ├── senal.js · cables.js · crimpado.js
+│   └── wifi.js · estructurado.js
 └── README.md
 ```
 

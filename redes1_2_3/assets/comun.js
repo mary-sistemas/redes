@@ -85,6 +85,29 @@ window.Repaso = (function () {
     $(`#${pre}Otra`).onclick = otro; otro();
   }
 
+  // Ordenar pasos: #preLista (botones desordenados), #preFb, #preReset.
+  function ordena(pre, pasos) {
+    const $ = s => document.querySelector(s);
+    let sig = 0, fallos = 0;
+    function pinta() {
+      sig = 0; fallos = 0;
+      const mezcla = pasos.map((t, i) => ({ t, i })).sort(() => Math.random() - .5);
+      $(`#${pre}Lista`).innerHTML = mezcla.map(p => `<button class="btn" data-i="${p.i}">${p.t}</button>`).join("");
+      $(`#${pre}Fb`).textContent = "Pulsa los pasos en el orden correcto.";
+      $(`#${pre}Lista`).querySelectorAll("button").forEach(b => b.onclick = () => {
+        if (+b.dataset.i === sig) {
+          b.classList.add("ok"); b.disabled = true; b.textContent = (sig + 1) + ". " + pasos[sig]; sig++;
+          $(`#${pre}Lista`).appendChild(b);
+          [...$(`#${pre}Lista`).querySelectorAll("button:not(.ok)")].forEach(x => $(`#${pre}Lista`).appendChild(x));
+          $(`#${pre}Fb`).innerHTML = sig === pasos.length
+            ? `<span class="fb ok">¡Completo!</span> ${fallos ? fallos + " fallo" + (fallos > 1 ? "s" : "") + " por el camino." : "Sin ningún fallo."}`
+            : "Bien. Sigue.";
+        } else { fallos++; $(`#${pre}Fb`).innerHTML = `<span class="fb mal">Ese no va ahora.</span> Piensa qué hace falta antes.`; }
+      });
+    }
+    $(`#${pre}Reset`).onclick = pinta; pinta();
+  }
+
   document.addEventListener("DOMContentLoaded", initTema);
-  return { store, marcas, guardaMarcas, preguntas, test };
+  return { store, marcas, guardaMarcas, preguntas, test, ordena };
 })();

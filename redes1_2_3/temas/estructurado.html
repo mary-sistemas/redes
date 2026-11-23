@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cableado estructurado · Repaso de Redes</title>
+<meta name="description" content="Subsistemas, tomas y etiquetado, cuartos y racks, paneles de parcheo, reglas de instalación, herramientas, diseño en tres capas, mapas de red y SNMP.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT3 · La capa física</span>
+  <h1>Cableado estructurado</h1>
+  <p>Cómo se cablea un edificio para que dure 15 años: qué va de la roseta al armario, cómo se etiqueta todo, qué hay en un rack, las reglas de instalación que no hay que saltarse y cómo se documenta y vigila la red.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#idea">La idea</a>
+  <a class="chip" href="#subsistemas">Subsistemas</a>
+  <a class="chip" href="#distancias">Distancias</a>
+  <a class="chip" href="#tomas">Tomas y etiquetas</a>
+  <a class="chip" href="#rack">Cuarto y rack</a>
+  <a class="chip" href="#instalacion">Instalación</a>
+  <a class="chip" href="#herramientas">Herramientas</a>
+  <a class="chip" href="#capas">Diseño en 3 capas</a>
+  <a class="chip" href="#mapas">Mapas</a>
+  <a class="chip" href="#snmp">SNMP</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+<!-- 1. idea -->
+<section id="idea">
+  <span class="eyebrow">La idea</span>
+  <h2>Cablear una vez, cambiar en el panel</h2>
+  <p>El <b>cableado estructurado</b> es un sistema normalizado e <b>independiente de la aplicación</b> (datos, voz, vídeo, domótica, cámaras) pensado para durar <b>10–15 años</b>. Se instala una vez y, cuando algo cambia (un puesto se mueve, una toma pasa de datos a teléfono), se cambia un latiguillo en el panel de parcheo, sin tirar cable nuevo.</p>
+  <p class="lead">Ventajas: orden, escalabilidad, mantenimiento y diagnóstico fáciles, compatibilidad entre fabricantes y varias tecnologías sobre la misma infraestructura.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Norma</th><th>Ámbito</th><th>Qué recoge</th></tr></thead>
+    <tbody>
+      <tr><td class="n">ANSI/TIA-568</td><td>EE. UU. / internacional</td><td>Componentes, categorías, distancias, colores T568A/B</td></tr>
+      <tr><td class="n">ISO/IEC 11801</td><td>Internacional</td><td>Cableado genérico por clases (D, E, EA, F, FA…)</td></tr>
+      <tr><td class="n">UNE-EN 50173</td><td>Europa / España</td><td>El equivalente europeo de la 11801</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 2. subsistemas -->
+<section id="subsistemas">
+  <span class="eyebrow">Simulador 1 · de la calle a la mesa</span>
+  <h2>Subsistemas</h2>
+  <p class="lead">Pulsa cada parte, de fuera hacia dentro.</p>
+  <div class="topo-wrap">
+    <div class="sub-esq" id="subEsq"></div>
+    <div class="panel det" id="subDet" aria-live="polite"></div>
+  </div>
+  <div class="note"><b>Nomenclatura:</b> en España se suele hablar de <b>MDF</b> (distribuidor principal, la sala de equipos) e <b>IDF</b> (distribuidores intermedios, los cuartos de cada planta).</div>
+</section>
+
+<!-- 3. distancias -->
+<section id="distancias">
+  <span class="eyebrow">Simulador 2 · la regla 90 + 10</span>
+  <h2>¿Cumple este enlace?</h2>
+  <p class="lead">Mueve los tres tramos de un canal horizontal.</p>
+  <div class="panel" style="display:grid;gap:14px">
+    <div class="rango"><label for="dPan">Latiguillo en el armario (panel ↔ switch): <b id="vPan"></b></label><input type="range" id="dPan" min="0" max="10" step="0.5" value="2"></div>
+    <div class="rango"><label for="dHor">Cable horizontal fijo (panel ↔ roseta): <b id="vHor"></b></label><input type="range" id="dHor" min="5" max="110" step="1" value="80"></div>
+    <div class="rango"><label for="dUsu">Latiguillo de usuario (roseta ↔ PC): <b id="vUsu"></b></label><input type="range" id="dUsu" min="0" max="10" step="0.5" value="3"></div>
+    <p id="dRes" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- 4. tomas -->
+<section id="tomas">
+  <span class="eyebrow">Área de trabajo</span>
+  <h2>Tomas de red y etiquetado</h2>
+  <div class="capas-tela">
+    <div style="--c:var(--l4)"><strong>¿Cuántas tomas?</strong>Como mínimo <b>2 por puesto</b> (datos + voz o reserva) y <b>una cada 10 m²</b> en oficinas, más las de impresoras, cámaras y AP (en el techo).</div>
+    <div style="--c:var(--l3)"><strong>Altura</strong>Rosetas de pared a <b>30–40 cm</b> del suelo, accesibles y sin obstáculos.</div>
+    <div style="--c:var(--l2)"><strong>Reserva de cable</strong>20–30 cm en la roseta y 1–3 m en el armario, recogidos con holgura.</div>
+    <div style="--c:var(--l7)"><strong>Etiqueta</strong>Un identificador único e <b>igual en los dos extremos</b>: <code>P1-A12</code> = planta 1, panel A, puerto 12.</div>
+  </div>
+  <div class="note">El cable se conecta a la roseta quitando el aislante y con la <b>herramienta de impacto</b>, siguiendo los colores T568A/B marcados en el módulo. La roseta debe ser de la misma categoría que el resto del canal.</div>
+  <div class="panel reto">
+    <span class="eyebrow">Simulador 3 · ejercicio 18 de clase</span>
+    <div class="q">Oficina de la planta 1 con 6 puestos, una impresora y un AP en el techo. ¿Cuántas tomas mínimas?</div>
+    <div class="opciones" id="tomOps"></div>
+    <p id="tomFb" aria-live="polite"></p>
+  </div>
+</section>
+
+<!-- 5. rack -->
+<section id="rack">
+  <span class="eyebrow">Espacios</span>
+  <h2>El cuarto de comunicaciones y el rack</h2>
+  <div class="topo-wrap">
+    <div class="panel" style="display:grid;gap:8px">
+      <h3>El cuarto</h3>
+      <p>Centrado en la zona que da servicio (que ningún cable horizontal pase de <b>90 m</b>) · exclusivo y con llave (no es un almacén) · <b>18–24 °C</b> y humedad del 40–60 % · corriente propia con <b>SAI</b> y toma de tierra · lejos de agua y de ascensores o transformadores · extintor de <b>CO₂</b>, nunca agua.</p>
+    </div>
+    <div class="panel" style="display:grid;gap:8px">
+      <h3>El rack, de arriba abajo</h3>
+      <div class="rack">
+        <div style="--c:var(--l1)">Panel de parcheo 24p · llegan los cables horizontales</div>
+        <div style="--c:var(--muted)">Guía-cables</div>
+        <div style="--c:var(--l2)">Switch 24p PoE · latiguillos cortos al panel</div>
+        <div style="--c:var(--muted)">Guía-cables</div>
+        <div style="--c:var(--l3)">Panel de fibra (LC) · cableado vertical</div>
+        <div style="--c:var(--l4)">Router / Firewall</div>
+        <div style="--c:var(--l6)">Servidor / NAS</div>
+        <div style="--c:var(--l7)">SAI · abajo, porque pesa</div>
+      </div>
+    </div>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th></th><th>Detalle</th></tr></thead>
+    <tbody>
+      <tr><th>Anchura</th><td><b>19 pulgadas</b> (482,6 mm) entre carriles</td></tr>
+      <tr><th>Unidad de rack</th><td><b>1 U = 44,45 mm</b> (1,75 in). Un switch de 24 puertos suele ocupar 1 U</td></tr>
+      <tr><th>Tipos</th><td>Mural (hasta unas 12 U), de suelo, abierto</td></tr>
+      <tr><th>Accesorios</th><td>Bandejas, guía-cables, regletas PDU, ventiladores, tapas ciegas, kit de tierra, cierre con llave</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Panel de parcheo:</b> elemento pasivo de 1 U con 12, 24 o 48 puertos. Por detrás se termina el cable horizontal <b>rígido</b>; por delante se enchufan los <b>latiguillos</b> hacia el switch. Así decides a qué puerto del switch va cada roseta sin tocar el cableado fijo. Debe ser de igual o mayor categoría que el cable. Los latiguillos (0,5–3 m, flexibles, de colores por servicio) <b>se compran certificados</b>, no se fabrican en obra.</div>
+</section>
+
+<!-- 6. instalación -->
+<section id="instalacion">
+  <span class="eyebrow">Reglas que no hay que saltarse</span>
+  <h2>Canalizaciones y recomendaciones</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Canalización</th><th>Uso</th></tr></thead>
+    <tbody>
+      <tr><td>Tubo rígido o corrugado</td><td>Empotrado en paredes y suelos</td></tr>
+      <tr><td>Canaleta de PVC</td><td>En superficie, con compartimentos para separar datos y corriente</td></tr>
+      <tr><td>Bandeja (perforada, de rejilla, de escalera)</td><td>Techos y falsos techos; ventila y deja crecer</td></tr>
+      <tr><td>Suelo técnico</td><td>Oficinas con suelo elevado</td></tr>
+      <tr><td>Arquetas y conductos subterráneos</td><td>Entre edificios</td></tr>
+    </tbody>
+  </table></div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Regla</th><th>Por qué</th></tr></thead>
+    <tbody>
+      <tr><td>Horizontal ≤ 90 m</td><td>Los 10 m restantes son para latiguillos</td></tr>
+      <tr><td>Separar datos y corriente (≥ 30 cm en paralelo o separador metálico; cruzarlos en perpendicular)</td><td>Los cables eléctricos y motores generan interferencias</td></tr>
+      <tr><td>Radio de curvatura ≥ 4 veces el diámetro (≥ 8 en fibra)</td><td>Un doblez deforma los pares: más diafonía y pérdidas</td></tr>
+      <tr><td>No tirar fuerte (máx. ~110 N en UTP)</td><td>Se estiran y deforman los hilos</td></tr>
+      <tr><td>Velcro mejor que bridas apretadas; no grapar ni pisar</td><td>Aplastar el cable cambia su geometría</td></tr>
+      <tr><td>Canalización ocupada &lt; 40–50 %</td><td>Para crecer y no presionar los cables</td></tr>
+      <tr><td>Destrenzar lo mínimo (&lt; 13 mm en Cat 5e)</td><td>El trenzado es lo que evita la diafonía</td></tr>
+      <tr><td><b>Sin empalmes</b> en el cobre horizontal</td><td>De la roseta al panel, un cable entero (la fibra sí admite empalmes por fusión)</td></tr>
+      <tr><td>Toda la cadena de la misma categoría; rígido en lo fijo, flexible en latiguillos</td><td>La categoría la marca el componente más bajo</td></tr>
+      <tr><td>Dejar 10–20 % de tomas libres</td><td>Ampliaciones futuras</td></tr>
+      <tr><td>Etiquetar, documentar, poner a tierra y <b>certificar</b></td><td>Sin documentación, cualquier avería se convierte en una búsqueda a ciegas</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 7. herramientas -->
+<section id="herramientas">
+  <span class="eyebrow">Simulador 4 · ¿qué herramienta?</span>
+  <h2>Herramientas</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Herramienta</th><th>Para qué</th></tr></thead>
+    <tbody>
+      <tr><td>Pelacables</td><td>Quitar la cubierta sin dañar los pares</td></tr>
+      <tr><td>Crimpadora RJ-45</td><td>Fijar el conector al cable (suele llevar cortador y pelador)</td></tr>
+      <tr><td>Herramienta de impacto</td><td>Meter y cortar cada hilo en los contactos de rosetas y paneles</td></tr>
+      <tr><td>Guía pasacables</td><td>Pasar cables por tubos y falsos techos</td></tr>
+      <tr><td>Comprobador básico</td><td>Continuidad y orden de los 8 hilos (LED 1–8 y G)</td></tr>
+      <tr><td>Comprobador con medida de longitud</td><td>Mide la longitud y localiza cortes o cortocircuitos</td></tr>
+      <tr><td><b>Certificador</b></td><td>Mide atenuación, longitud, retardo… y certifica la categoría con informe</td></tr>
+      <tr><td>Generador y sonda de tonos</td><td>Identificar qué cable es cuál entre muchos (qué roseta va a qué puerto del panel)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel reto">
+    <div class="q" id="herQ"></div>
+    <div class="opciones" id="herOps"></div>
+    <p id="herFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="herOtra">Otro</button><span class="marcador" id="herCuenta"></span></div>
+  </div>
+</section>
+
+<!-- 8. capas -->
+<section id="capas">
+  <span class="eyebrow">Diseño jerárquico</span>
+  <h2>Acceso, distribución y núcleo</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Capa</th><th>Qué hace</th><th>Equipos</th></tr></thead>
+    <tbody>
+      <tr><td><b>Núcleo (core)</b></td><td>Mueve tráfico muy rápido entre los bloques y hacia fuera. <b>Sin lógica pesada</b> (ni ACL complejas): solo velocidad y redundancia total</td><td>Switches de 10/40/100 G</td></tr>
+      <tr><td><b>Distribución</b></td><td>Agrupa los switches de acceso y aplica políticas: ACL, QoS, enrutamiento entre VLAN. Es la frontera de los dominios de difusión</td><td>Switches multicapa (L3), routers</td></tr>
+      <tr><td><b>Acceso</b></td><td>Conecta los equipos finales (PC, AP, impresoras, teléfonos). Seguridad de puerto, VLAN de acceso, PoE</td><td>Switches de 24/48 puertos con PoE</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Núcleo colapsado:</b> en redes pequeñas o medianas (un edificio, un instituto) núcleo y distribución se juntan y quedan solo dos capas. Es lo más habitual.</div>
+  <div class="note"><b>Relación con el cableado:</b> el horizontal une el acceso con los usuarios; el vertical (fibra) une acceso con distribución y núcleo; el de campus une edificios.</div>
+  <div class="panel" style="display:grid;gap:12px">
+    <span class="eyebrow">Simulador 5 · sobresuscripción</span>
+    <div class="campo">
+      <label>Puertos de acceso<input id="sPu" value="48" inputmode="numeric"></label>
+      <label>Velocidad por puerto (Gbps)<input id="sVe" value="1" inputmode="decimal"></label>
+      <label>Enlace ascendente (Gbps)<input id="sUp" value="10" inputmode="decimal"></label>
+      <label>Uso simultáneo (%)<input id="sUso" value="25" inputmode="numeric"></label>
+    </div>
+    <p id="sRes"></p>
+  </div>
+  <p><b>Latencia</b> (aumenta con los saltos y las colas), <b>congestión</b> (la demanda supera al enlace y se pierden paquetes) y <b>redundancia</b> (enlaces y equipos dobles, SAI) también se tienen en cuenta al diseñar.</p>
+</section>
+
+<!-- 9. mapas -->
+<section id="mapas">
+  <span class="eyebrow">Documentar</span>
+  <h2>Mapa físico y mapa lógico</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th></th><th>Mapa físico</th><th>Mapa lógico</th></tr></thead>
+    <tbody>
+      <tr><th>Representa</th><td>Dónde están los equipos y cómo se conectan de verdad</td><td>Cómo fluye la información</td></tr>
+      <tr><th>Capas</th><td>Capa 1</td><td>Capas 2, 3 y superiores</td></tr>
+      <tr><th>Qué aparece</th><td>Edificios, plantas, racks, posición en U, puertos, cables (tipo, categoría, longitud), rosetas, AP en el plano</td><td>IP y máscaras, subredes, VLAN, gateway, servidores (DHCP, DNS), DMZ, SSID</td></tr>
+      <tr><th>Sirve para</th><td>Mantenimiento, ampliaciones, averías de cableado</td><td>Configuración, problemas de comunicación, seguridad</td></tr>
+      <tr><th>Ejemplo</th><td>«SW-A1 (U10, rack 1) Gi0/12 → panel A puerto 12 → roseta P0-A12 (aula 3)»</td><td>«VLAN 10 profesores 192.168.10.0/24, gateway .1»</td></tr>
+    </tbody>
+  </table></div>
+  <p>Herramientas: <b>draw.io</b> (diagramas), <b>Packet Tracer</b> o GNS3 (simular), <b>Zenmap</b> (descubrir la topología), Acrylic o WiFiman (mapas de cobertura Wi-Fi). Y siempre: actualizar los mapas cuando algo cambia y nombrar los equipos con un criterio (SW-A1-P1, AP-02…).</p>
+</section>
+
+<!-- 10. snmp -->
+<section id="snmp">
+  <span class="eyebrow">Vigilar la red</span>
+  <h2>SNMP</h2>
+  <p><b>SNMP</b> (protocolo de capa de aplicación) permite vigilar y gestionar switches, routers, AP, impresoras, servidores y SAI desde un punto central.</p>
+  <div class="capas-tela">
+    <div style="--c:var(--l7)"><strong>Gestor (NMS)</strong>La aplicación que pregunta y recoge datos (Zabbix; el MIB Browser de Packet Tracer).</div>
+    <div style="--c:var(--l3)"><strong>Agente</strong>El software dentro de cada equipo vigilado, que responde al gestor.</div>
+    <div style="--c:var(--l2)"><strong>MIB</strong>La base de datos en árbol con las variables del equipo: estado de interfaces, tráfico, CPU, temperatura…</div>
+  </div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Versión</th><th>Seguridad</th><th>Estado</th></tr></thead>
+    <tbody>
+      <tr><td class="n">SNMPv1</td><td>Comunidad (contraseña) sin cifrar</td><td>Obsoleta</td></tr>
+      <tr><td class="n">SNMPv2c</td><td>Comunidad sin cifrar</td><td>Muy usada pero insegura</td></tr>
+      <tr><td class="n">SNMPv3</td><td>Usuarios, autenticación (SHA) y cifrado (AES)</td><td><b>Recomendada</b></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>Nunca dejar las comunidades por defecto</b> (<code>public</code> / <code>private</code>): cualquiera podría leer la topología o incluso cambiar la configuración. Usar SNMPv3, limitar qué IP pueden preguntar y preferir <b>solo lectura</b>.</div>
+  <div class="note"><b>Get y Walk</b> (práctica en Packet Tracer): <b>Get</b> pide un único valor (por ejemplo <code>sysName</code>). <b>Walk</b> recorre una tabla y devuelve una entrada por interfaz (por ejemplo <code>ifOperStatus</code>: up(1) o down(2)).</div>
+  <div class="panel" style="display:grid;gap:10px">
+    <span class="eyebrow">Simulador 6 · ejercicio 20: ordena el procedimiento</span>
+    <div class="orden-list" id="snmLista"></div>
+    <p id="snmFb"></p>
+    <div class="stepper"><button class="btn" id="snmReset">Barajar otra vez</button></div>
+  </div>
+</section>
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="wifi.html">← Anterior: Wi-Fi</a>
+  <a href="../index.html">Has terminado la UT3 · volver a todos los temas →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/estructurado.js"></script>
+</body>
+</html>
