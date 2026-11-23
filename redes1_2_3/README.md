@@ -11,8 +11,8 @@ Web interactiva para repasar el módulo de **Planificación y Administración de
 | UT1 | Sistemas de numeración | ✅ Disponible |
 | UT1 | Redes locales y medios | ✅ Disponible |
 | UT2 | Capas y protocolos | ✅ Disponible |
-| UT2 | Wireshark y tramas | Próximamente |
-| UT2 | Normalización e IEEE 802 | Próximamente |
+| UT2 | Wireshark y tramas | ✅ Disponible |
+| UT2 | Normalización e IEEE 802 | ✅ Disponible |
 | UT3 | Señal y modulación | Próximamente |
 | UT3 | Cables y categorías | Próximamente |
 | UT3 | Crimpado y comprobador | Próximamente |
@@ -27,13 +27,17 @@ repaso-redes/
 ├── temas/
 │   ├── numeracion.html     una página por tema
 │   ├── redes-locales.html
-│   └── capas.html
+│   ├── capas.html
+│   ├── wireshark.html
+│   └── normas.html
 ├── assets/
 │   ├── estilos.css     estilos comunes (tema claro y oscuro)
 │   ├── comun.js        botón de tema y progreso guardado
 │   ├── numeracion.js   simuladores y preguntas de cada tema
 │   ├── redes-locales.js
-│   └── capas.js
+│   ├── capas.js
+│   ├── wireshark.js
+│   └── normas.js
 └── README.md
 ```
 

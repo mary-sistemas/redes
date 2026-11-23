@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Normalización e IEEE 802 · Repaso de Redes</title>
+<meta name="description" content="Protocolos, estándares de facto y formales, organismos de normalización, arquitectura en capas y la familia IEEE 802.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT2 · Arquitecturas y protocolos</span>
+  <h1>Normalización e IEEE 802</h1>
+  <p>Qué es exactamente un protocolo, quién escribe las normas, por qué las redes se dividen en capas y cómo el IEEE partió la capa de enlace en dos para que Ethernet y Wi-Fi hablen el mismo idioma con IP.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#protocolo">Protocolo</a>
+  <a class="chip" href="#estandares">De facto y formales</a>
+  <a class="chip" href="#organismos">Organismos</a>
+  <a class="chip" href="#capas">¿Por qué capas?</a>
+  <a class="chip" href="#segmentos">Segmentar</a>
+  <a class="chip" href="#ieee">IEEE 802</a>
+  <a class="chip" href="#csma">CSMA/CD y CA</a>
+  <a class="chip" href="#familia">La familia 802</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+
+<!-- 1. protocolo -->
+<section id="protocolo">
+  <span class="eyebrow">La idea</span>
+  <h2>Un protocolo es un idioma con reglas estrictas</h2>
+  <p>No basta con tener un cable entre dos equipos: tienen que «hablar el mismo idioma técnico». Un <b>protocolo</b> es el conjunto de normas que fija cómo se transmiten e intercambian los datos. Como cualquier idioma, tiene tres partes:</p>
+  <div class="analog">
+    <div><strong>Sintaxis · la forma</strong>Estructura, formato y orden de los campos. «Primero 6 bytes de MAC destino, luego 6 de origen, luego 2 de tipo». Como la gramática.</div>
+    <div><strong>Semántica · el significado</strong>Qué quiere decir cada patrón de bits y qué hay que hacer al recibirlo. «Este código significa petición de conexión». Como el vocabulario.</div>
+    <div><strong>Temporización · el cuándo</strong>Velocidad, sincronización y orden de los intercambios, para que el receptor no se desborde. Como los turnos de palabra.</div>
+  </div>
+  <div class="panel reto">
+    <span class="eyebrow">Simulador 1 · ¿sintaxis, semántica o temporización?</span>
+    <div class="q" id="proQ"></div>
+    <div class="opciones" id="proOps"></div>
+    <p id="proFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="proOtra">Otra</button><span class="marcador" id="proCuenta"></span></div>
+  </div>
+</section>
+
+<!-- 2. estándares -->
+<section id="estandares">
+  <span class="eyebrow">Estándares</span>
+  <h2>De facto frente a formales</h2>
+  <p class="lead">Los estándares existen para que equipos de marcas distintas funcionen juntos (<b>interoperabilidad</b>). Pueden nacer de dos maneras:</p>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:8px">
+      <h3>De facto («de hecho»)</h3>
+      <p>Nadie los aprobó oficialmente, pero <b>todo el mundo los usa</b> por éxito práctico o dominio del mercado.</p>
+      <p>Ejemplos: <b>TCP/IP</b> (ganó a OSI en la práctica), <b>Ethernet</b> antes de que lo aprobara el IEEE, <b>USB</b>.</p>
+    </div>
+    <div class="panel" style="display:grid;gap:8px">
+      <h3>Formales («de derecho»)</h3>
+      <p>Redactados, aprobados y publicados por un <b>organismo oficial</b> de normalización.</p>
+      <p>Ejemplos: el <b>modelo OSI</b> (ISO), <b>IEEE 802.3</b>, <b>ITU-T X.25</b>.</p>
+    </div>
+  </div>
+  <div class="note"><b>Un mismo estándar puede pasar de uno a otro.</b> Ethernet empezó siendo de facto (Xerox, Intel y DEC) y se convirtió en formal cuando el IEEE lo publicó como 802.3.</div>
+</section>
+
+<!-- 3. organismos -->
+<section id="organismos">
+  <span class="eyebrow">Quién escribe las normas</span>
+  <h2>Organismos de normalización</h2>
+  <p class="lead">Con saber a grandes rasgos <b>qué hace cada uno</b> basta. El truco es asociar cada sigla con una palabra clave.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Ámbito</th><th>Siglas</th><th>Palabra clave</th><th>Qué hace en redes</th></tr></thead>
+    <tbody>
+      <tr><td>Internacional</td><td class="n">ISO</td><td>OSI</td><td>Estándares industriales globales, entre ellos el modelo OSI (ISO/IEC 7498)</td></tr>
+      <tr><td></td><td class="n">IEEE</td><td>802</td><td>Capas física y de enlace de las LAN y MAN a través del comité 802 (Ethernet, Wi-Fi)</td></tr>
+      <tr><td></td><td class="n">IETF</td><td>RFC</td><td>Los protocolos reales de Internet (TCP, IP, DNS, HTTP), publicados en documentos RFC</td></tr>
+      <tr><td></td><td class="n">ITU-T</td><td>Telefonía</td><td>Telecomunicaciones y telefonía internacionales (fibra, DSL)</td></tr>
+      <tr><td>Estados Unidos</td><td class="n">ANSI</td><td>Supervisa</td><td>Supervisa los estándares voluntarios de EE. UU.; colabora con TIA</td></tr>
+      <tr><td></td><td class="n">TIA</td><td>Cableado</td><td>Cableado estructurado (serie ANSI/TIA-568, la de T568A y T568B)</td></tr>
+      <tr><td>Europa</td><td class="n">ETSI</td><td>Móviles</td><td>Telecomunicaciones europeas y telefonía móvil (GSM, 4G, 5G)</td></tr>
+      <tr><td></td><td class="n">CEN / CENELEC</td><td>Normas EN</td><td>Normas europeas EN, obligatorias en proyectos dentro de la UE</td></tr>
+      <tr><td>España</td><td class="n">AENOR / UNE</td><td>UNE</td><td>Adapta y publica las normas europeas e internacionales como normas UNE</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel reto">
+    <span class="eyebrow">Simulador 2 · ¿quién es?</span>
+    <div class="q" id="orgQ"></div>
+    <div class="opciones" id="orgOps"></div>
+    <p id="orgFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="orgOtra">Otra</button><span class="marcador" id="orgCuenta"></span></div>
+  </div>
+</section>
+
+<!-- 4. capas -->
+<section id="capas">
+  <span class="eyebrow">Arquitectura en capas</span>
+  <h2>¿Por qué dividir la red en capas?</h2>
+  <p>Mandar una web implica problemas muy distintos a la vez: generar voltajes en un cable, evitar colisiones, encontrar la ruta por Internet, recuperar datos perdidos y mostrar la página. En vez de resolverlo todo de golpe, cada capa se encarga de <b>una sola cosa</b>, ofrece servicios a la capa de arriba y usa los de la capa de abajo.</p>
+  <div class="capas-tela">
+    <div style="--c:var(--l4)"><strong>Interoperabilidad</strong>Equipos de fabricantes distintos funcionan juntos si respetan la interfaz entre capas.</div>
+    <div style="--c:var(--l3)"><strong>Evolución independiente</strong>Cambias la tarjeta de cobre por una de fibra (capas 1 y 2) y el navegador ni se entera.</div>
+    <div style="--c:var(--l7)"><strong>Diagnóstico fácil</strong>Puedes aislar el fallo: ¿es el cable, la IP o la aplicación? Se revisa capa a capa.</div>
+  </div>
+  <div class="note"><b>OSI y TCP/IP no compiten en lo mismo.</b> OSI (ISO, 1984) es un <b>marco teórico</b> para estudiar y comparar; no está instalado en ningún sistema. TCP/IP (DARPA, ARPANET) nació de la práctica y es el estándar <b>de facto</b> sobre el que funciona Internet. Lo tienes todo en <a href="capas.html">Capas y protocolos</a>.</div>
+</section>
+
+<!-- 5. segmentación -->
+<section id="segmentos">
+  <span class="eyebrow">Simulador 3</span>
+  <h2>Segmentación, secuenciación y multiplexación</h2>
+  <p class="lead">Mandar un archivo de 4 GB de una sola vez bloquearía el cable para todos, y si fallase un bit al final habría que repetirlo entero. Por eso se trocea. Avanza paso a paso.</p>
+  <div class="panel" style="display:grid;gap:14px">
+    <div><span class="eyebrow">Origen</span><div class="seg-row" id="segOrig"></div></div>
+    <div><span class="eyebrow">Canal compartido</span><div class="seg-row" id="segCanal"></div></div>
+    <div><span class="eyebrow">Destino</span><div class="seg-row" id="segDest"></div></div>
+    <p id="segTxt"></p>
+    <div class="stepper">
+      <button class="btn" id="segPrev">← Anterior</button>
+      <button class="btn pri" id="segNext">Siguiente paso →</button>
+      <div class="dots" id="segDots" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. IEEE 802 -->
+<section id="ieee">
+  <span class="eyebrow">Proyecto IEEE 802 · 1980</span>
+  <h2>La capa de enlace, partida en dos</h2>
+  <p>Cuando aparecieron las LAN, cada fabricante hacía las cosas a su manera. El IEEE lanzó el <b>Proyecto 802</b> para normalizar las capas física y de enlace. Su gran idea: dividir la <b>capa 2</b> en dos subcapas.</p>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:8px;border-top:4px solid var(--l3)">
+      <h3>LLC · 802.2 (arriba)</h3>
+      <p><b>Logical Link Control.</b> Toca con la capa de red. Es <b>la misma para todas las tecnologías</b>: da a IP una interfaz común e identifica qué protocolo de red va dentro de la trama.</p>
+    </div>
+    <div class="panel" style="display:grid;gap:8px;border-top:4px solid var(--l2)">
+      <h3>MAC (abajo)</h3>
+      <p><b>Media Access Control.</b> Toca con la capa física y es <b>distinta para cada tecnología</b> (una para Ethernet, otra para Wi-Fi). Se encarga de la dirección MAC de 48 bits, de delimitar la trama, del FCS/CRC y de decidir quién transmite (CSMA/CD o CSMA/CA).</p>
+    </div>
+  </div>
+  <div class="note"><b>La analogía:</b> la LLC es como un enchufe estándar en la pared y la MAC, el adaptador de cada país. IP siempre se enchufa igual (LLC), da igual que debajo haya cable, Wi-Fi o fibra (MAC distinta).</div>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>OSI</th><th>PDU</th><th>TCP/IP</th><th>IEEE 802</th></tr></thead>
+    <tbody>
+      <tr><td>7 · 6 · 5 Aplicación, Presentación, Sesión</td><td>Datos</td><td>Aplicación</td><td rowspan="3">Fuera de IEEE 802 (HTTP, TCP, UDP, IP…)</td></tr>
+      <tr><td>4 · Transporte</td><td>Segmento / Datagrama</td><td>Transporte</td></tr>
+      <tr><td>3 · Red</td><td>Paquete</td><td>Internet</td></tr>
+      <tr><td>2 · Enlace</td><td>Trama</td><td rowspan="2">Acceso a la red</td><td><b>LLC</b> 802.2 + <b>MAC</b> (802.3, 802.11, 802.1Q)</td></tr>
+      <tr><td>1 · Física</td><td>Bits</td><td>Física: 1000BASE-T, 10GBASE-SR, radio Wi-Fi</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 7. CSMA -->
+<section id="csma">
+  <span class="eyebrow">Control de acceso al medio</span>
+  <h2>CSMA/CD frente a CSMA/CA</h2>
+  <p class="lead">Los dos empiezan igual: <b>CSMA</b> = escuchar si el medio está libre antes de hablar (Carrier Sense) en un medio que comparten muchos (Multiple Access). Cambia lo que hacen con las colisiones.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th></th><th>CSMA/CD · Collision Detection</th><th>CSMA/CA · Collision Avoidance</th></tr></thead>
+    <tbody>
+      <tr><th>Dónde</th><td>Ethernet compartido (hubs, coaxial)</td><td>Wi-Fi (obligatorio)</td></tr>
+      <tr><th>Idea</th><td><b>Detecta</b> la colisión cuando ocurre</td><td><b>Evita</b> la colisión antes de que ocurra</td></tr>
+      <tr><th>Cómo</th><td>Si choca: para, manda una señal de atasco (jam) y espera un tiempo aleatorio (backoff) antes de reintentar</td><td>Escucha el medio y espera siempre un tiempo aleatorio (backoff) antes de transmitir</td></tr>
+      <tr><th>¿Por qué así?</th><td>En un cable se puede escuchar mientras se transmite</td><td>En el aire una antena no puede oír a otras mientras emite, así que no puede detectar el choque</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note warn"><b>Para el V/F:</b> en las redes actuales con <b>switches y full-duplex ya no hay colisiones</b>, así que CSMA/CD casi no actúa. Sigue en la norma, pero es historia.</div>
+</section>
+
+<!-- 8. familia -->
+<section id="familia">
+  <span class="eyebrow">La familia IEEE 802</span>
+  <h2>Qué regula cada norma</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Norma</th><th>Nombre</th><th>Qué regula</th></tr></thead>
+    <tbody>
+      <tr><td class="n">802.1</td><td>Gestión e interconexión</td><td>Arquitectura general. <b>802.1Q</b>: VLAN (etiqueta las tramas). <b>802.1X</b>: autenticación en los puertos</td></tr>
+      <tr><td class="n">802.2</td><td>LLC</td><td>La subcapa de control de enlace lógico, común a todas</td></tr>
+      <tr><td class="n">802.3</td><td>Ethernet</td><td>LAN cableada: 100BASE-TX, 1000BASE-T, 10GBASE-T, 10GBASE-SR/LR. Usa CSMA/CD</td></tr>
+      <tr><td class="n">802.11</td><td>Wi-Fi</td><td>WLAN en 2,4, 5 y 6 GHz. Wi-Fi 5 (ac), 6/6E (ax), 7 (be). Usa CSMA/CA</td></tr>
+      <tr><td class="n">802.15</td><td>WPAN</td><td>Redes personales: <b>802.15.1</b> Bluetooth y <b>802.15.4</b> Zigbee</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel" style="display:grid;gap:12px">
+    <span class="eyebrow">Simulador 4 · cómo se lee un nombre de Ethernet</span>
+    <div class="filtros" role="group" aria-label="Variante" id="varBtns"></div>
+    <div class="grupos" id="varPartes"></div>
+    <p id="varTxt"></p>
+  </div>
+  <div class="panel reto">
+    <span class="eyebrow">Simulador 5 · ¿qué norma es?</span>
+    <div class="q" id="famQ"></div>
+    <div class="opciones" id="famOps"></div>
+    <p id="famFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="famOtra">Otra</button><span class="marcador" id="famCuenta"></span></div>
+  </div>
+</section>
+
+<!-- 9. comprueba -->
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="wireshark.html">← Anterior: Wireshark y tramas</a>
+  <span class="eyebrow">Siguiente tema: UT3, próximamente</span>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/normas.js"></script>
+</body>
+</html>

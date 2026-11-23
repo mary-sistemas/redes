@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Wireshark y tramas · Repaso de Redes</title>
+<meta name="description" content="Leer una captura de Wireshark capa a capa: Ethernet, IP, TCP y HTTP; filtros, ARP, ICMP y Ethernet II frente a 802.3.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT2 · Arquitecturas y protocolos</span>
+  <h1>Wireshark y tramas</h1>
+  <p>Cómo leer una captura de verdad: qué hay en cada capa de una petición web, dónde están las MAC, las IP y los puertos, qué número dice qué va dentro y cómo distinguir una trama Ethernet II de una 802.3.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#idea">La idea</a>
+  <a class="chip" href="#captura">Capturar</a>
+  <a class="chip" href="#diseccion">Disección</a>
+  <a class="chip" href="#trama">La trama</a>
+  <a class="chip" href="#tramos">Punto A y B</a>
+  <a class="chip" href="#otros">ARP e ICMP</a>
+  <a class="chip" href="#ethii">Ethernet II o 802.3</a>
+  <a class="chip" href="#filtros">Filtros</a>
+  <a class="chip" href="#comprueba">Preguntas</a>
+</nav>
+
+<!-- 1. idea -->
+<section id="idea">
+  <span class="eyebrow">La idea</span>
+  <h2>Unos rayos X para la red</h2>
+  <p>Wireshark copia todo lo que pasa por tu tarjeta de red y te lo enseña <b>desencapsulado</b>, capa a capa, igual que haría el equipo que lo recibe. Lo que en la teoría son «cabeceras» aquí son números que puedes leer.</p>
+  <div class="analog">
+    <div><strong>Panel de arriba · lista</strong>Un paquete por línea: número, tiempo, origen, destino, protocolo e info.</div>
+    <div><strong>Panel del medio · detalles</strong>El paquete elegido, desplegado por capas: Frame, Ethernet II, IPv4, TCP, HTTP.</div>
+    <div><strong>Panel de abajo · bytes</strong>Los mismos datos en hexadecimal, tal cual viajaron. Al pulsar un campo arriba se marca aquí.</div>
+  </div>
+  <div class="note">El orden de los detalles es siempre <b>de abajo arriba en la pila</b>: primero la capa 1 (Frame), luego la 2 (Ethernet), la 3 (IP), la 4 (TCP/UDP) y la 7 (HTTP, DNS…). Es el desencapsulamiento escrito en pantalla.</div>
+</section>
+
+<!-- 2. captura -->
+<section id="captura">
+  <span class="eyebrow">Como en la práctica</span>
+  <h2>Capturar una petición HTTP limpia</h2>
+  <p class="lead">Se usa <b>HTTP sin cifrar</b> para que se vean las cabeceras de las capas altas. Con HTTPS, TLS cifra todo lo que va por encima de TCP y Wireshark solo te enseña «Application Data».</p>
+  <div class="panel" style="display:grid;gap:10px">
+    <p><b>1.</b> Abre Wireshark y empieza a capturar en tu interfaz (Wi-Fi o Ethernet).</p>
+    <p><b>2.</b> Haz la petición desde un terminal: <code>curl -i http://ejemplo.com</code> (o en una ventana de incógnito escribiendo <code>http://</code> delante).</p>
+    <p><b>3.</b> Para la captura y guárdala: <b>Archivo → Guardar como…</b> en formato <code>.pcapng</code>.</p>
+    <p><b>4.</b> Filtra el ruido: <code>http.request.method == "GET"</code></p>
+    <p><b>5.</b> Comprueba que la IP de origen es la tuya con <code>ipconfig</code> (Windows) o <code>ip a</code> (Linux).</p>
+  </div>
+</section>
+
+<!-- 3. disección -->
+<section id="diseccion">
+  <span class="eyebrow">Simulador 1 · como el panel de Wireshark</span>
+  <h2>Disección de una petición GET</h2>
+  <p class="lead">El escenario de los ejercicios de clase: el Host A (192.168.1.15) pide <code>http://203.0.113.5/index.html</code>. Pulsa una capa o un campo y mira qué bytes ocupa.</p>
+  <div class="ws">
+    <div class="panel arbol" id="arbol"></div>
+    <div class="panel" style="display:grid;gap:12px">
+      <div class="hex" id="hex" aria-label="Bytes en hexadecimal"></div>
+      <p class="ws-info" id="wsInfo"></p>
+    </div>
+  </div>
+  <div class="note"><b>Fíjate en los «indicadores» de lo que va dentro</b> (cuestión 1 de la práctica): en Ethernet II el campo <b>Type</b> vale <code>0x0800</code> → dentro va IPv4. En IPv4 el campo <b>Protocol</b> vale <code>6</code> → dentro va TCP. En TCP el <b>puerto de destino</b> 80 → se entrega al servidor web.</div>
+</section>
+
+<!-- 4. trama -->
+<section id="trama">
+  <span class="eyebrow">Capa 2</span>
+  <h2>Los campos de una trama Ethernet</h2>
+  <div class="pdu-scroll"><div class="trama">
+    <div class="gris" style="--c:var(--muted)"><b>Preámbulo</b><span>8 B · sincroniza</span></div>
+    <div style="--c:var(--l2)"><b>MAC destino</b><span>6 B</span></div>
+    <div style="--c:var(--l2)"><b>MAC origen</b><span>6 B</span></div>
+    <div style="--c:var(--l2)"><b>EtherType</b><span>2 B</span></div>
+    <div style="--c:var(--l3);flex:1"><b>Datos (paquete IP)</b><span>46 – 1500 B</span></div>
+    <div class="gris" style="--c:var(--l2)"><b>FCS / CRC</b><span>4 B · cola</span></div>
+  </div></div>
+  <div class="note"><b>¿Por qué la MAC de destino va primero?</b> Porque es lo primero que necesita leer la tarjeta de red (o el switch) para decidir si la trama es para ella. Así puede descartarla sin leer el resto.</div>
+  <div class="note warn"><b>Lo que no verás en Wireshark:</b> el preámbulo y normalmente el FCS los quita la propia tarjeta de red antes de pasar la trama al sistema. Por eso la trama capturada empieza directamente en la MAC de destino.</div>
+  <p>Una <b>MAC</b> tiene 48 bits (6 bytes) escritos en hexadecimal. La mitad izquierda (3 bytes) es el <b>OUI</b>, que identifica al fabricante; por eso Wireshark a veces escribe «Intel_3c:4d:5e» en vez de la dirección entera. <code>ff:ff:ff:ff:ff:ff</code> es la dirección de <b>difusión</b> (broadcast): para todos.</p>
+</section>
+
+<!-- 5. tramos -->
+<section id="tramos">
+  <span class="eyebrow">Simulador 2 · el ejercicio de clase</span>
+  <h2>Rellena el Punto A y el Punto B</h2>
+  <p class="lead">Mismo escenario. <b>Punto A</b>: la trama al salir del PC (cable LAN). <b>Punto B</b>: al salir del router por su interfaz WAN. Escribe los valores y pulsa comprobar.</p>
+  <div class="panel" style="display:grid;gap:8px;font-family:var(--f-mono);font-size:.8rem">
+    <div>HOST A · IP 192.168.1.15 · MAC AA:11:BB:22:CC:11 · GW 192.168.1.1 · puerto efímero 54321</div>
+    <div>ROUTER R1 eth0 (LAN) · IP 192.168.1.1 · MAC BB:22:CC:11:11:11</div>
+    <div>ROUTER R1 eth1 (WAN) · IP 203.0.113.1 · MAC BB:22:CC:22:22:22</div>
+    <div>SERVIDOR · IP 203.0.113.5 · MAC CC:55:DD:33:44:55 · HTTP puerto 80</div>
+  </div>
+  <div class="tbl-scroll"><table class="rellena" id="rellena"></table></div>
+  <div class="stepper"><button class="btn pri" id="rellOk">Comprobar</button><button class="btn" id="rellSol">Ver solución</button><button class="btn" id="rellBorra">Borrar</button></div>
+  <p id="rellFb" aria-live="polite"></p>
+</section>
+
+<!-- 6. ARP ICMP -->
+<section id="otros">
+  <span class="eyebrow">Otros protocolos que verás</span>
+  <h2>ARP e ICMP en una captura</h2>
+  <div class="vs">
+    <div class="panel" style="display:grid;gap:8px">
+      <h3>ARP · EtherType 0x0806</h3>
+      <p>Tu PC sabe la IP del router pero necesita su MAC para montar la trama. Pregunta a toda la red: <b>«¿Quién tiene 192.168.1.1? Díselo a 192.168.1.15»</b>.</p>
+      <p>La petición (request) va a la MAC de difusión <code>ff:ff:ff:ff:ff:ff</code>; la respuesta (reply) va solo al que preguntó. Va directamente sobre Ethernet: <b>no lleva cabecera IP</b>.</p>
+    </div>
+    <div class="panel" style="display:grid;gap:8px">
+      <h3>ICMP · Protocolo IP = 1</h3>
+      <p>Es lo que usa <code>ping</code>: un <b>Echo request</b> (tipo 8) y su <b>Echo reply</b> (tipo 0). También avisa de errores, como «destino inalcanzable» o «TTL agotado» (lo que usa traceroute).</p>
+      <p>Va dentro de IP, pero <b>no tiene puertos</b>: no usa TCP ni UDP.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7. Ethernet II vs 802.3 -->
+<section id="ethii">
+  <span class="eyebrow">Simulador 3 · adelanto para el examen de diciembre</span>
+  <h2>¿Ethernet II o IEEE 802.3?</h2>
+  <p class="lead">Las dos tramas tienen la misma forma y el mismo hueco de 2 bytes después de la MAC de origen. Lo que cambia es <b>qué significa ese número</b>.</p>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th></th><th>Ethernet II (DIX)</th><th>IEEE 802.3</th></tr></thead>
+    <tbody>
+      <tr><th>Esos 2 bytes son…</th><td><b>Type</b>: qué protocolo va dentro</td><td><b>Length</b>: cuántos bytes de datos lleva</td></tr>
+      <tr><th>Valor</th><td class="n">≥ 0x0600 (1536)</td><td class="n">≤ 0x05DC (1500)</td></tr>
+      <tr><th>¿Cómo sabe qué va dentro?</th><td>Por el propio Type (0x0800 IPv4, 0x0806 ARP, 0x86DD IPv6)</td><td>Por la cabecera <b>LLC (802.2)</b> que va justo detrás, con DSAP y SSAP</td></tr>
+      <tr><th>Dónde la verás</th><td>Casi todo el tráfico: IP, ARP…</td><td>Tráfico de control de los switches, como STP</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Por qué funciona el truco:</b> una trama nunca lleva más de 1500 bytes de datos, así que un «Length» nunca puede pasar de 0x05DC. Los Types se eligieron todos a partir de 0x0600 para que no se pudieran confundir. Basta con mirar si el número es grande o pequeño.</div>
+  <div class="panel reto">
+    <div class="q" id="ethQ"></div>
+    <div class="opciones" id="ethOps"></div>
+    <p id="ethFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="ethOtra">Otra</button><span class="marcador" id="ethCuenta"></span></div>
+  </div>
+</section>
+
+<!-- 8. filtros -->
+<section id="filtros">
+  <span class="eyebrow">Simulador 4 · filtros de visualización</span>
+  <h2>¿Qué filtro escribirías?</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Filtro</th><th>Muestra</th></tr></thead>
+    <tbody>
+      <tr><td class="n">http.request.method == "GET"</td><td>Solo las peticiones GET de HTTP</td></tr>
+      <tr><td class="n">dns · arp · icmp · http</td><td>Solo ese protocolo</td></tr>
+      <tr><td class="n">ip.addr == 8.8.8.8</td><td>Todo lo que tiene esa IP como origen o destino</td></tr>
+      <tr><td class="n">ip.src == 192.168.1.15</td><td>Solo lo que sale de esa IP</td></tr>
+      <tr><td class="n">tcp.port == 80</td><td>TCP con el puerto 80 en origen o destino</td></tr>
+      <tr><td class="n">eth.addr == ff:ff:ff:ff:ff:ff</td><td>Tramas de difusión</td></tr>
+    </tbody>
+  </table></div>
+  <div class="panel reto">
+    <div class="q" id="filQ"></div>
+    <div class="opciones" id="filOps"></div>
+    <p id="filFb" aria-live="polite"></p>
+    <div class="stepper"><button class="btn" id="filOtra">Otro</button><span class="marcador" id="filCuenta"></span></div>
+  </div>
+</section>
+
+<!-- 9. comprueba -->
+<section id="comprueba">
+  <span class="eyebrow">Comprueba</span>
+  <h2>Preguntas tipo examen</h2>
+  <p class="lead">Escribe tu respuesta con tus palabras antes de mirar. Luego compárala y márcate. El marcador se guarda en este navegador.</p>
+  <p class="marcador" id="marcador"></p>
+  <div class="stepper"><button class="btn pri" id="verTodas" type="button">Ver todas las respuestas</button></div>
+  <div class="lista-preg" id="preguntas"></div>
+  <div class="stepper"><button class="btn" id="borrar">Borrar mis marcas</button></div>
+</section>
+
+<div class="sigue">
+  <a href="capas.html">← Anterior: Capas y protocolos</a>
+  <a href="normas.html">Siguiente: Normalización e IEEE 802 →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/wireshark.js"></script>
+</body>
+</html>

@@ -62,6 +62,29 @@ window.Repaso = (function () {
     dibuja(); pintaMarcador(); pintaTodas();
   }
 
+  // Mini test de opciones: #preQ (enunciado), #preOps, #preFb, #preOtra, #preCuenta.
+  // Cada caso: {q, ok, exp, ops?}; si el caso no trae ops, se usan las comunes.
+  function test(pre, casos, opsComunes) {
+    const $ = s => document.querySelector(s);
+    let actual = null, bien = 0, total = 0;
+    function otro() {
+      let c; do { c = casos[Math.floor(Math.random() * casos.length)]; } while (casos.length > 1 && c === actual);
+      actual = typeof c === "function" ? c() : c;
+      $(`#${pre}Q`).innerHTML = actual.q; $(`#${pre}Fb`).innerHTML = "";
+      const ops = actual.ops || opsComunes;
+      $(`#${pre}Ops`).innerHTML = ops.map(o => `<button class="btn" data-o="${o.replace(/"/g, "&quot;")}">${o}</button>`).join("");
+      $(`#${pre}Ops`).querySelectorAll("button").forEach(b => b.onclick = () => responde(b));
+    }
+    function responde(b) {
+      const ok = b.dataset.o === actual.ok; total++; if (ok) bien++;
+      $(`#${pre}Ops`).querySelectorAll("button").forEach(x => { x.disabled = true; if (x.dataset.o === actual.ok) x.classList.add("ok"); });
+      if (!ok) b.classList.add("mal");
+      $(`#${pre}Fb`).innerHTML = `<span class="fb ${ok ? "ok" : "mal"}">${ok ? "¡Bien!" : "No: es " + actual.ok + "."}</span> ${actual.exp}`;
+      $(`#${pre}Cuenta`).textContent = `${bien} de ${total} bien`;
+    }
+    $(`#${pre}Otra`).onclick = otro; otro();
+  }
+
   document.addEventListener("DOMContentLoaded", initTema);
-  return { store, marcas, guardaMarcas, preguntas };
+  return { store, marcas, guardaMarcas, preguntas, test };
 })();
