@@ -23,6 +23,7 @@ Web interactiva para repasar el módulo de **Planificación y Administración de
 | UT4 | El conmutador | ✅ Disponible |
 | UT4 | Configurar el switch (Cisco IOS, terminal simulado) | ✅ Disponible |
 | UT4 | STP | ✅ Disponible |
+| UT4 | Preparar los test de la práctica (ejercicios resueltos y simulacro) | ✅ Disponible |
 
 ## Estructura
 

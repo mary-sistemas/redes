@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Preparar los test de la práctica UT4 · Repaso de Redes</title>
+<meta name="description" content="Ejercicios 11 a 21 resueltos con el porqué de cada salida y error, y simulacro de los dos cuestionarios con el formato real: 8 preguntas, 50 s, sin volver atrás.">
+<script>try{var t=JSON.parse(localStorage.getItem("redes:tema"));if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="sitebar">
+    <a class="marca" href="../index.html"><span class="logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Repaso de Redes</a>
+    <button class="tema-btn" id="temaBtn" type="button">Modo oscuro</button>
+  </div>
+<header class="top">
+  <a class="migas" href="../index.html">← Todos los temas</a>
+  <span class="eyebrow">UT4 · Práctica: administración de conmutadores y STP</span>
+  <h1>Preparar los test de la práctica UT4</h1>
+  <p>Los dos cuestionarios preguntan por lo que ejecutas y ves en los ejercicios: comandos, salidas, mensajes de error y su causa. Aquí tienes cada ejercicio resuelto con el porqué y lo que pasaría si cambiaras algo, y un simulacro con las mismas reglas que el de clase.</p>
+</header>
+<nav class="indice" aria-label="En esta página">
+  <a class="chip" href="#formato">Cómo es el test</a>
+  <a class="chip" href="#simulacro">Simulacro</a>
+  <a class="chip" href="#t1">Test 1 · ej. 11 a 17</a>
+  <a class="chip" href="#t2">Test 2 · ej. 18 a 21</a>
+</nav>
+<section id="formato">
+  <span class="eyebrow">Reglas</span>
+  <h2>Cómo es cada cuestionario</h2>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Test</th><th>Ejercicios</th><th>Preparación</th></tr></thead>
+    <tbody>
+      <tr><td><b>Test 1</b></td><td>11, 12, 13, 16 y 17</td><td>Bloques 5, 6 y 7 (haz también el 14 y el 15: el 16 los usa)</td></tr>
+      <tr><td><b>Test 2</b></td><td>18, 19, 20 y 21</td><td>Bloques 7, 8 y 9</td></tr>
+    </tbody>
+  </table></div>
+  <div class="capas-tela">
+    <div style="--c:var(--l2)"><strong>8 preguntas</strong>4 opciones, una sola correcta. Safe Exam Browser, en el aula.</div>
+    <div style="--c:var(--l7)"><strong>~50 s por pregunta</strong>Un intento, sin volver atrás y sin saber si aciertas.</div>
+    <div style="--c:var(--l4)"><strong>Puntuación</strong>Acierto +0,625 · fallo −0,21 · en blanco 0. Cada test vale 5 puntos.</div>
+  </div>
+  <div class="note"><b>¿Contestar o dejar en blanco?</b> Hagamos la cuenta. Si contestas al azar entre 4 opciones, de media ganas 0,25 × 0,625 − 0,75 × 0,21 ≈ <b>0</b>: ni ganas ni pierdes. Si puedes <b>descartar una</b> y eliges entre 3: 0,33 × 0,625 − 0,67 × 0,21 ≈ <b>+0,07</b>. Si descartas dos: ≈ <b>+0,21</b>. Conclusión: <b>en blanco solo si no puedes descartar ninguna</b>.</div>
+  <div class="note warn"><b>Con 50 s no da tiempo a pensarlo todo:</b> las preguntas son del tipo «qué pasaría si falta este paso» o «qué mensaje sale». Lo que te salva es haber probado los errores en Packet Tracer (o en el <a href="ios.html">terminal simulado</a>), no memorizar los comandos.</div>
+</section>
+
+<section id="simulacro">
+  <span class="eyebrow">Simulacro</span>
+  <h2>Hazlo como el de verdad</h2>
+  <p class="lead">8 preguntas al azar del banco del test que elijas, 50 s cada una, sin volver atrás. Al final ves tu nota y la explicación de cada pregunta. Cada vez salen preguntas distintas.</p>
+  <div class="panel" style="display:grid;gap:14px" id="sim">
+    <div class="stepper"><button class="btn pri" data-test="1">Empezar Test 1 (ej. 11–17)</button><button class="btn pri" data-test="2">Empezar Test 2 (ej. 18–21)</button></div>
+    <div id="simZona"></div>
+  </div>
+</section>
+
+<section id="t1">
+  <span class="eyebrow">Test 1</span>
+  <h2>Ejercicios 11 a 17 resueltos</h2>
+
+  <h3>Ejercicio 11 · Conectar switches y PC</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Observación</th><th>Respuesta</th><th>¿Por qué?</th></tr></thead>
+    <tbody>
+      <tr><td>Puntos ámbar al conectar</td><td>Unos <b>30 s</b> en pasar a verde. Lo explica <b>STP</b></td><td>Cada puerto nuevo pasa por escucha (15 s) y aprendizaje (15 s) antes de reenviar, para comprobar que no crea un bucle</td></tr>
+      <tr><td>Cable entre SW1 y SW2</td><td><b>Cruzado</b></td><td>Son equipos iguales (en un 2960 real valdría directo por Auto-MDI/MDI-X, pero el ejercicio pide cruzado)</td></tr>
+      <tr><td>Tabla MAC de SW1</td><td>PC1 → Fa0/1 · PC2 → Fa0/2 · <b>PC3 y PC4 → Fa0/24</b></td><td>SW1 aprende por el puerto por el que <b>entra</b> la trama: todo lo de PC3 y PC4 le llega por el enlace con SW2</td></tr>
+      <tr><td>Tabla MAC de SW2</td><td>PC3 → Fa0/1 · PC4 → Fa0/2 · <b>PC1 y PC2 → Fa0/24</b></td><td>Lo mismo, al revés</td></tr>
+      <tr><td>Dominios</td><td><b>5 de colisión</b> y <b>1 de broadcast</b></td><td>Uno por cada enlace de switch (4 PC + el enlace entre switches). No hay router, así que todo es un único dominio de broadcast</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>¿Y si…?</b> Si la tabla aparece vacía es porque aún no ha habido tráfico: hasta que un PC envía algo, el switch no lo aprende. Haz el ping antes del show.</div>
+
+  <h3>Ejercicio 12 · Consola y configuración básica</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Paso</th><th>Qué ves</th><th>¿Por qué?</th></tr></thead>
+    <tbody>
+      <tr><td>Terminal de PC1</td><td><b>9600 baudios, 8 bits de datos, sin paridad, 1 bit de parada, sin control de flujo</b></td><td>Son los valores estándar de la consola Cisco</td></tr>
+      <tr><td><code>Switch&gt; show running-config</code></td><td><code>% Invalid input detected at '^' marker.</code></td><td>En el modo de usuario no están esos show: hace falta <code>enable</code></td></tr>
+      <tr><td><code>hostname SW1</code></td><td>El indicador cambia en el acto a <code>SW1(config)#</code></td><td>El cambio se aplica a running-config inmediatamente</td></tr>
+      <tr><td><code>description PC1-Acceso</code> + <code>show interfaces status</code></td><td>Fa0/1 muestra PC1-Acceso en la columna <b>Name</b></td><td>La descripción es solo una etiqueta: no cambia el funcionamiento</td></tr>
+      <tr><td>Tabulador · <code>conf t</code> · <code>?</code></td><td>Completa la palabra · abreviatura de configure terminal · ayuda contextual</td><td><code>interface ?</code> lista tipos como FastEthernet, GigabitEthernet, Vlan, Port-channel, range</td></tr>
+      <tr><td><code>interface range fa0/1 - 2</code> + <code>shutdown</code></td><td>Los enlaces de PC1 y PC2 en <b>rojo</b>; el ping de PC3 a .11 <b>falla</b></td><td>Los puertos quedan administrativamente desactivados. Con <code>no shutdown</code> vuelven (pasando antes por ámbar, por STP)</td></tr>
+      <tr><td><code>copy running-config startup-config</code></td><td>Pregunta <code>Destination filename [startup-config]?</code> → Enter</td><td>Los comandos cambian running-config (RAM). Sin copiar a startup-config (NVRAM), se pierden al reiniciar</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Ejercicio 13 · IP de administración, Telnet y SSH</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Paso</th><th>Qué ves</th><th>¿Por qué? · ¿Y si…?</th></tr></thead>
+    <tbody>
+      <tr><td><code>interface vlan 1</code>, IP y <code>no shutdown</code></td><td>Vlan1 con 192.168.1.2 en <b>up</b></td><td>Está up porque hay al menos un puerto con enlace activo en la VLAN 1. <b>Sin ningún equipo conectado: down</b>. Sin <code>no shutdown</code>: <b>administratively down</b></td></tr>
+      <tr><td>Ping de PC3 a 192.168.1.2</td><td>Responde</td><td>El switch ya tiene IP en la misma red que los PC</td></tr>
+      <tr><td><code>enable secret</code> + <code>line console 0</code>, <code>password</code>, <code>login</code></td><td>Al reconectar pide <b>Clave-Consola1</b>; al escribir enable, <b>Clave-Privilegiado1</b></td><td>Sin <code>login</code>, la contraseña de consola existe pero <b>no se pide</b></td></tr>
+      <tr><td><code>line vty 0 15</code> + password + login, y <code>telnet 192.168.1.2</code></td><td>Pide Telnet-VTY1 → <code>SW1&gt;</code>; con enable → SW1#</td><td>Si hay <code>login</code> sin contraseña en las VTY, Telnet corta: «Password required, but none set»</td></tr>
+      <tr><td><code>username admin secret …</code></td><td>Crea un usuario local con contraseña cifrada</td><td>Lo usa <code>login local</code></td></tr>
+      <tr><td><code>ip domain-name aula.local</code></td><td>Define el dominio</td><td>Con el hostname forma el nombre de las claves: SW1.aula.local</td></tr>
+      <tr><td><code>crypto key generate rsa modulus 2048</code></td><td>Genera las claves RSA: activa SSH</td><td>Si el equipo se llama Switch: <b>% Please define a hostname other than Switch.</b> Sin dominio: <b>% Please define a domain-name first.</b></td></tr>
+      <tr><td><code>transport input ssh</code></td><td>Las VTY solo aceptan SSH</td><td>Por eso Telnet desde PC3 pasa a ser <b>rechazado</b></td></tr>
+      <tr><td><code>login local</code></td><td>Pide usuario y contraseña de la base local</td><td>SSH: <code>ssh -l admin 192.168.1.2</code> pide Clave-Admin1 → SW1&gt;</td></tr>
+      <tr><td><code>service password-encryption</code> y <code>show running-config</code></td><td>enable secret aparece como <code>secret 5 $1$…</code> (hash). Las de línea, como <code>password 7 0822…</code></td><td>El hash del secret no se puede revertir; el tipo 7 es <b>débil y reversible</b>: solo evita que se lean a simple vista</td></tr>
+      <tr><td><code>banner motd #Acceso restringido#</code></td><td>El aviso sale <b>antes</b> de pedir la contraseña</td><td>El <code>#</code> es solo el delimitador del texto</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Ejercicios 14 y 15 · Archivos y TFTP (preparan el 16)</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Situación</th><th>Resultado</th><th>¿Por qué?</th></tr></thead>
+    <tbody>
+      <tr><td><code>show flash:</code></td><td>La imagen IOS <b>c2960-lanbasek9-mz.150-2.SE4.bin</b> está en la <b>flash</b></td><td>Flash = sistema operativo; RAM = running; NVRAM = startup</td></tr>
+      <tr><td><code>hostname SW1-PRUEBA</code> sin guardar</td><td>running: SW1-PRUEBA · startup: SW1</td><td>Solo cambia la de la RAM</td></tr>
+      <tr><td><code>reload</code> → «Save? [yes/no]» → no</td><td>Arranca como <b>SW1</b></td><td>Se carga startup-config, y el cambio no estaba guardado</td></tr>
+      <tr><td><code>copy running-config tftp:</code></td><td>En el servidor aparece <b>SW1-confg</b></td><td>Nombre propuesto: hostname + «-confg»</td></tr>
+      <tr><td>PRUEBA-FUSION y luego <code>copy tftp: running-config</code></td><td>La descripción <b>sigue</b></td><td>Copiar a running-config <b>fusiona</b>: añade comandos, no borra los que hay</td></tr>
+      <tr><td><code>erase startup-config</code> + <code>reload</code></td><td>Indicador <b>Switch&gt;</b>, configuración de fábrica</td><td>No hay configuración guardada que cargar</td></tr>
+      <tr><td>Restaurar desde TFTP tras el borrado</td><td>Primero hay que poner IP a <code>vlan 1</code> y <code>no shutdown</code></td><td>Sin IP el switch no puede hablar con el servidor: «Timed out»</td></tr>
+      <tr><td><code>copy tftp: startup-config</code></td><td><b>Sustituye</b> la guardada (se aplica en el próximo arranque)</td><td>Para dejarlo de fábrica también: <code>delete flash:vlan.dat</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Ejercicio 16 · Actualizar el IOS</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Paso</th><th>Comando</th><th>Lo que importa</th></tr></thead>
+    <tbody>
+      <tr><td>1. Ver versión y espacio</td><td><code>show version</code> · <code>show flash:</code></td><td>Versión 15.0(2)SE4, imagen actual y bytes libres</td></tr>
+      <tr><td>2. Elegir la imagen</td><td>Services &gt; TFTP del servidor: una que empiece por <b>c2960</b></td><td>En un equipo real: <b>comprobar MD5 o SHA</b> para saber que no está dañada, y que sea compatible con el modelo</td></tr>
+      <tr><td>3. Copia de la configuración</td><td><code>copy running-config tftp:</code></td><td>Por si algo sale mal</td></tr>
+      <tr><td>4. Copiar la imagen</td><td><code>copy tftp: flash:</code></td><td>Si ya existe, pregunta si se sobrescribe: no hace falta, la imagen ya está. No cortar la alimentación y conservar la imagen anterior</td></tr>
+      <tr><td>5. Arranque</td><td><code>boot system flash:&lt;imagen&gt;</code> + <code>copy running-config startup-config</code></td><td>Si no guardas, el <code>boot system</code> se pierde y arranca con la imagen de antes</td></tr>
+      <tr><td>6. Comprobar</td><td><code>reload</code> · <code>show version</code></td><td>«System image file is flash:&lt;nueva&gt;» y conserva la configuración</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Ejercicio 17 · Tabla MAC</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Paso</th><th>Qué ves</th><th>¿Por qué?</th></tr></thead>
+    <tbody>
+      <tr><td><code>clear mac address-table dynamic</code></td><td><b>0 entradas</b> dinámicas (puede que alguna reaparezca enseguida si hay tráfico)</td><td>Borra solo las aprendidas</td></tr>
+      <tr><td>Ping de PC1 a PC2 y a PC3, y <code>show … dynamic</code></td><td>PC1 Fa0/1, PC2 Fa0/2, <b>PC3 Fa0/24</b>, todas <b>DYNAMIC</b></td><td>PC3 llega por el enlace con SW2</td></tr>
+      <tr><td><code>show mac address-table aging-time</code></td><td><b>300</b> (por defecto) → <b>600</b> tras el cambio</td><td>Una entrada dinámica sin tráfico durante ese tiempo <b>se borra</b></td></tr>
+      <tr><td><code>mac address-table static 0060.xxxx.xxxx vlan 1 interface fa0/2</code></td><td>La MAC de PC2 aparece como <b>STATIC</b> y <b>sigue</b> tras el clear dynamic</td><td>Las estáticas no envejecen ni se borran con el clear dynamic. La MAC va en <b>formato Cisco</b> (xxxx.xxxx.xxxx); con guiones o dos puntos da error</td></tr>
+      <tr><td><code>no mac address-table static …</code></td><td>Desaparece</td><td>El <code>no</code> deshace el comando</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="t2">
+  <span class="eyebrow">Test 2</span>
+  <h2>Ejercicios 18 a 21 resueltos</h2>
+
+  <h3>Ejercicio 18 · Seguridad de puertos</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Paso</th><th>Qué ves</th><th>¿Por qué? · ¿Y si…?</th></tr></thead>
+    <tbody>
+      <tr><td><code>switchport mode access</code> + port-security (máx. 1, sticky, restrict)</td><td>Se acepta</td><td>Sin <code>switchport mode access</code>: <b>Command rejected: FastEthernet0/1 is a dynamic port.</b></td></tr>
+      <tr><td>Ping de PC1 y <code>show port-security …</code></td><td>Fa0/1: máx. 1, modo <b>Restrict</b>, MAC de PC1 como <b>SecureSticky</b></td><td>sticky la aprende y la escribe en running-config (hay que guardar para conservarla)</td></tr>
+      <tr><td>PC5 en Fa0/1 con <b>restrict</b></td><td>El ping <b>falla</b>, el contador de violaciones <b>sube</b>, el puerto sigue <b>connected</b>, aviso <code>%PORT_SECURITY-2-PSECURE_VIOLATION</code> en show logging</td><td>Restrict descarta y avisa, pero no apaga el puerto</td></tr>
+      <tr><td>Modo <b>shutdown</b> y otro ping de PC5</td><td>Fa0/1 en <b>err-disabled</b>, enlace en rojo</td><td>Es el modo por defecto. Con <b>protect</b> se descartaría sin aviso ni contador</td></tr>
+      <tr><td>Recuperar</td><td>Quitar el intruso, reconectar PC1, <code>shutdown</code> + <code>no shutdown</code></td><td>Si el intruso sigue conectado, vuelve a saltar. Al final, guardar</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Ejercicio 19 · Interpretar salidas</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Observación</th><th>Diagnóstico</th><th>Causa probable</th><th>Siguiente paso</th></tr></thead>
+    <tbody>
+      <tr><td>Fa0/2 notconnect</td><td>Sin enlace físico</td><td>Cable suelto o roto, impresora apagada</td><td>Revisar cable y equipo</td></tr>
+      <tr><td>Fa0/3 disabled</td><td>Desactivado a mano</td><td><code>shutdown</code> en la interfaz</td><td><code>no shutdown</code></td></tr>
+      <tr><td>Fa0/4 err-disabled</td><td>Desactivado por el switch</td><td>Violación de port security</td><td><code>show port-security interface fa0/4</code>, <code>show logging</code>, quitar el intruso, shutdown + no shutdown</td></tr>
+      <tr><td>Fa0/5 half, CRC y late collisions</td><td><b>Duplex mismatch</b></td><td>SW2 fijado en full; este cae en half por autonegociación</td><td>Los dos en auto o los dos en full</td></tr>
+      <tr><td>MAC de Fa0/23 a Fa0/24</td><td><b>Bucle de capa 2</b></td><td>Enlaces redundantes sin STP (o STP desactivado)</td><td><code>show spanning-tree</code>, revisar enlaces</td></tr>
+      <tr><td>Red lenta, LED parpadeando a la vez</td><td><b>Tormenta de broadcast</b></td><td>El mismo bucle</td><td>Cortar el bucle y revisar STP</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Ejercicio 20 · STP en el triángulo</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Observación</th><th>Respuesta</th><th>¿Por qué?</th></tr></thead>
+    <tbody>
+      <tr><td>Puntos que quedan en ámbar</td><td><b>Uno</b>, en el enlace entre los dos no raíz, en el switch de <b>mayor BID</b></td><td>Es el puerto bloqueado: evita el bucle</td></tr>
+      <tr><td>Puente raíz</td><td>El de <b>MAC más baja</b>, con «This bridge is the root»</td><td>Todos tienen 32768 (se ve 32769 = 32768 + VLAN 1)</td></tr>
+      <tr><td>Roles</td><td>Raíz: sus 2 puertos <b>Desg FWD</b>. Cada no raíz: puerto hacia la raíz <b>Root FWD</b>. Enlace entre no raíz: uno <b>Desg FWD</b> y otro <b>Altn BLK</b></td><td>Empatan a coste 19: gana el de menor BID</td></tr>
+      <tr><td><code>show spanning-tree summary</code></td><td>Modo <b>pvst</b> y cuántos puertos en cada estado</td><td>PVST+ es lo que usa Cisco por defecto</td></tr>
+      <tr><td><code>show spanning-tree interface fa0/1</code></td><td>Rol, estado y <b>coste 19</b></td><td>Enlace de 100 Mbps</td></tr>
+      <tr><td>Apagar el puerto raíz del no raíz designado</td><td>El bloqueado pasa por <b>LIS → LRN → FWD</b> en unos <b>50 s</b> y el ping vuelve</td><td>20 s de max age + 15 + 15</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Ejercicio 21 · Cambiar el puente raíz</h3>
+  <div class="tbl-scroll"><table class="grid-tabla">
+    <thead><tr><th>Comando</th><th>Prioridad</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td><code>spanning-tree vlan 1 root primary</code> en SWX</td><td><b>24576</b> (se ve 24577)</td><td>SWX pasa a ser raíz: los demás tienen 32768</td></tr>
+      <tr><td><code>… root secondary</code> en SWY</td><td><b>28672</b> (se ve 28673)</td><td>Será raíz si cae SWX</td></tr>
+      <tr><td><code>… priority 4096</code> en SWZ</td><td><b>4096</b> (se ve 4097)</td><td>SWZ pasa a ser raíz: la más baja de las tres. Un valor que no sea múltiplo de 4096 da error</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><b>Por qué conviene elegir la raíz:</b> por defecto gana la MAC más baja, que suele ser el switch más antiguo, quizá uno de acceso en una esquina. Interesa que sea uno de distribución o núcleo: central, con más capacidad, para que el tráfico vaya por los mejores enlaces.</div>
+</section>
+
+<div class="sigue">
+  <a href="stp.html">← Anterior: STP</a>
+  <a href="../index.html">Volver a todos los temas →</a>
+</div>
+</div>
+<script src="../assets/comun.js"></script>
+<script src="../assets/testut4.js"></script>
+</body>
+</html>
